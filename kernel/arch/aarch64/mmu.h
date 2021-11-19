@@ -54,9 +54,9 @@
 #define PTE_USER (AP_UNPREVILEGED << 6)
 #define PTE_RW (AP_RW << 7)
 #define PTE_RO (AP_RO << 7)
-#define PTE_SH (0b11 < 8) // 对于SMP系统来说,全部设置为Inner-share就可以了
-#define PTE_AF_USED (1 < 10)
-#define PTE_AF_UNUSED (0 < 10)
+#define PTE_SH (0b11 << 8) // 对于SMP系统来说,全部设置为Inner-share就可以了
+#define PTE_AF_USED (1 << 10)
+#define PTE_AF_UNUSED (0 << 10)
 
 // 取得页表项中的物理地址 我们需要[47:12]范围的内容
 #define PTE_ADDR(pte) ((uint64_t)(pte)&0xfffffffff000)
@@ -64,7 +64,7 @@
 #define PTE_FLAG(pte) ((uint64_t)(pte) & (~0xfffffffff000))
 
 // 默认页表项 带缓存的memory,inner share,特权读写 AF置位
-#define PTE_NORMAL_MEMORY (MM_TYPE_BLOCK | PTE_AIDX_MEMORY | PTE_SH | PTE_AF_USED)
+#define PTE_NORMAL_MEMORY ( MM_TYPE_BLOCK | PTE_AIDX_MEMORY | PTE_SH | PTE_AF_USED | PTE_RW )
 // 设备内存页表项
 #define PTE_DEVICE_MEMORY (MM_TYPE_BLOCK | PTE_AIDX_DEVICE_nGnRn | PTE_AF_USED)
 // 指向下一级页表
