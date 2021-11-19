@@ -1,3 +1,5 @@
+#include "mmu.h"
+#include "./board/raspi3/memlayout.h"
 
 .section ".text._entry"
 
@@ -97,6 +99,20 @@ switch_to_el1_from_el2:
 
 jump_to_main:
 // 此时CPU已经工作在EL1状态
+    /* 配置页表 */
+    adr     x2, kpgd // 取得页表地址
+    msr     ttbr0_el1, x2
+    msr     ttbr1_el1, x2
+    ldr     x3, =(TCR_VALUE)
+    msr     tcr_el1, x3
+    ldr     x4, =(MAIR_VALUE)
+    msr     mair_el1, x4
+
+    /* 使能MMU */
+    mrs     x5, sctlr_el1
+    orr     x5, x5, #SCTLR_MMU_ENABLED
+    msr     sctlr_el1, x5     
+
     ldr     x0, =_entry
     mov     sp, x0 // 先暂时将_entry作为内核栈的顶部
     

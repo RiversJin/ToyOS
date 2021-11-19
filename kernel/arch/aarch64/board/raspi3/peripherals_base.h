@@ -1,5 +1,6 @@
 #ifndef PERIPHERALS_BASE
 #define PERIPHERALS_BASE
+#include "memlayout.h"
 
 #ifndef KERNEL_BASE
 #define KERNEL_BASE 0x0

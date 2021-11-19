@@ -1,7 +1,7 @@
 OUTPUT_ARCH("aarch64")
 ENTRY( _entry )
 SECTIONS{
-    . = 0x80000;
+    . = 0xFFFF000000080000;
     .text : {
         *(.text._entry)
         *(.text .text.*)
