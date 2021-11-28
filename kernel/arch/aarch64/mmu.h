@@ -1,7 +1,8 @@
 #ifndef MMU_H
 #define MMU_H
 
-#define PGSIZE 4096
+#define PAGE_SHIFT 12
+#define PGSIZE (1<<PAGE_SHIFT)
 /* 
     在AARCH64的MMU页表项中,在4K页粒度下,格式如下
     |63 --- 52|51 --- 48|47 --- 12|11 --- 2| 1 | 0|

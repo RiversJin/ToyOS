@@ -2,6 +2,7 @@
 #define MEMLAYOUT_H
 
 #define PHYSTOP 0x3F000000 // 在这之后就是MMIO的区域 也就是说 可用的物理内存范围就是从0-0x3eFFFFFF 共1008M
+#define TOTAL_STOP 0x40000000
 /* 在我们使用48位有效虚拟地址的情况下 地址空间分为两个部分 
    0x0000_0000_0000_0000至0x0000_FFFF_FFFF_FFFF 和 
    0xFFFF_0000_0000_0000至0xFFFF_FFFF_FFFF_FFFF 
