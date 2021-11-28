@@ -1,10 +1,12 @@
 #include "memlayout.h"
-#include "../../../memory/memory.h"
+#include "lib/string.h"
+#include "memory/memory.h"
 
 extern char kernel_end[];
 struct page pages[TOTAL_PAGES_N];
 
 void pages_init(struct pg_range* range){
+    memset(pages,0,sizeof(struct page)*TOTAL_PAGES_N);
     pg_idx_t kernel_pg_idx_tail = PHY2PFn(kernel_end);
     for(pg_idx_t i=0;i<=kernel_pg_idx_tail;++i){
         set_page_kernel(PFn2PAGE(i));

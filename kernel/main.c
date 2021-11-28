@@ -3,6 +3,7 @@
 
 __attribute__((noreturn))
 void main(){
+
     console_init();
     alloc_init();
     panic("hello the world.");
