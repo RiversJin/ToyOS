@@ -7,11 +7,11 @@ OBJCOPY := $(ARCH)-objcopy
 SRC_DIR := kernel
 BUILD_DIR := build
 
-CFLAGS := -Wall -g -O2 \
+CFLAGS := -Wall -g -O0 \
           -fno-pie -fno-pic -fno-stack-protector \
           -static -fno-builtin -nostdlib -ffreestanding -nostartfiles \
           -mgeneral-regs-only \
-	      -MMD -MP -Iinc
+	      -MMD -MP -Ikernel/
 LINKER_SCRIPT := $(SRC_DIR)/linker.ld
 KERNEL_ELF := $(BUILD_DIR)/kernel8.elf
 KERNEL_IMG := $(BUILD_DIR)/kernel8.img

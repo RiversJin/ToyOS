@@ -1,5 +1,6 @@
 #ifndef COMPILER_ATTRIBUTES_H
 #define COMPILER_ATTRIBUTES_H
+#include <stddef.h>
 
 #define   noinline                      __attribute__((__noinline__))
 #define __always_inline                 inline __attribute__((__always_inline__))
@@ -9,10 +10,10 @@
 # define barrier() __asm__ __volatile__("": : :"memory")
 #endif
 
-typedef __u8  __attribute__((__may_alias__))  __u8_alias_t;
-typedef __u16 __attribute__((__may_alias__)) __u16_alias_t;
-typedef __u32 __attribute__((__may_alias__)) __u32_alias_t;
-typedef __u64 __attribute__((__may_alias__)) __u64_alias_t;
+typedef uint8_t  __attribute__((__may_alias__)) __u8_alias_t;
+typedef uint16_t __attribute__((__may_alias__)) __u16_alias_t;
+typedef uint32_t __attribute__((__may_alias__)) __u32_alias_t;
+typedef uint64_t __attribute__((__may_alias__)) __u64_alias_t;
 
 static __always_inline void __read_once_size(const volatile void *p, void *res, int size)
 {

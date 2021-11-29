@@ -31,7 +31,12 @@ inline static void set_page_used(struct page *page){
 inline static void set_page_unused(struct page *page){
     page->flags &= ~PAGE_USED;
 }
-
+inline static void set_page_mapcount(struct page *page,int32_t count){
+    page->_mapcount = count;
+}
+inline static int32_t get_page_mapcount(struct page* page){
+    return page->_mapcount;
+}
 inline static void set_page_refcount(struct page *page,int32_t value){
     page->_refcount = value;
 }
