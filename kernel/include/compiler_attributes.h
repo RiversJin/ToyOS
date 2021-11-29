@@ -4,6 +4,11 @@
 #define   noinline                      __attribute__((__noinline__))
 #define __always_inline                 inline __attribute__((__always_inline__))
 
+#ifndef barrier
+/* The "volatile" is due to gcc bugs */
+# define barrier() __asm__ __volatile__("": : :"memory")
+#endif
+
 typedef __u8  __attribute__((__may_alias__))  __u8_alias_t;
 typedef __u16 __attribute__((__may_alias__)) __u16_alias_t;
 typedef __u32 __attribute__((__may_alias__)) __u32_alias_t;
