@@ -75,7 +75,7 @@ static inline void free_one_page(struct page * page, pg_idx_t pg_idx, order_t or
 void alloc_init(void){
     struct pg_range pg_range;
     pages_init(&pg_range);
-    free_pages(pg_range.begin, pg_range.end);
+    
     zone.managed_pages = 0;
     for(int i = 0; i<MAX_ORDER;++i){
         struct free_area* free_area_ptr = zone.area + i;

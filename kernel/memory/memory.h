@@ -22,7 +22,7 @@ struct page{
     struct list_head lru;
     void* virtual_address;
 };
-extern struct page pages[TOTAL_PAGES_N];
+extern struct page *pages;
 extern struct pg_range free_zone;
 
 inline static void set_page_used(struct page *page){
