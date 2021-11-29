@@ -17,6 +17,19 @@ struct zone{
     struct free_area area[MAX_ORDER];
 } zone;
 
+void log_alloc_system_info(void){
+    cprintf("Buddy system info:\n");
+    cprintf("Available pages: %d bytes:%d\n",zone.managed_pages,zone.managed_pages*PGSIZE);
+    cprintf("Each order:\n");
+    int free_pages = 0;
+    for(int i=0;i<MAX_ORDER;++i){
+        int bytes = zone.area[i].n_free << i;
+        cprintf("Order: %d\tfree: %d\tpages:%d\n",i,zone.area[i].n_free,bytes);
+        free_pages += bytes;
+    }
+    cprintf("Total free pages: %d\n",free_pages);
+}
+
 static inline void free_one_page(struct page * page, pg_idx_t pg_idx, order_t order);
 
 
@@ -44,7 +57,12 @@ static void free_pages_core(pg_idx_t pfn,order_t order){
     zone.managed_pages += n_pages;
     free_one_page(begin,pfn,order);
 }
-
+/**
+ * @brief 释放指定范围的页
+ * 
+ * @param begin 
+ * @param end 
+ */
 static void free_pages(pg_idx_t begin, pg_idx_t end){
     order_t order;
     while(begin < end){
@@ -56,13 +74,24 @@ static void free_pages(pg_idx_t begin, pg_idx_t end){
         begin += (1UL << order);
     }
 }
+/**
+ * @brief 释放一个页
+ * 
+ * @param page 
+ * @param pg_idx 
+ * @param order 
+ */
 static inline void free_one_page(struct page * page, pg_idx_t pg_idx, order_t order){
     while(order < MAX_ORDER){
         // 寻找它的buddy 验证对于buddy是否可释放
         pg_idx_t buddy_page_idx = _find_buddy_pfn(pg_idx, order);
         struct page * buddy_page = page + (buddy_page_idx - pg_idx);
+        // 如果buddy不可释放 退出
         if(!page_is_buddy(page, buddy_page,order))
             break;
+
+        list_del(&buddy_page->lru);
+        zone.area[order].n_free -= 1;
         pg_idx_t combined_pg_idx = pg_idx & buddy_page_idx;
         page = page + (combined_pg_idx - pg_idx);
         pg_idx = combined_pg_idx;
@@ -83,5 +112,7 @@ void alloc_init(void){
         INIT_LIST_HEAD(&free_area_ptr->free_list);
     }
     free_pages(pg_range.begin,pg_range.end);
+
+    log_alloc_system_info();
 }
 
