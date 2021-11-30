@@ -34,18 +34,27 @@ static inline void free_one_page(struct page * page, pg_idx_t pg_idx, order_t or
 
 
 static inline void del_page_from_free_list(struct page* page,order_t order){
+    //cprintf("del_page_from_free_list: order: %d\t",order);
     list_del(&page->lru);
-    set_page_order(page,0);
+    set_page_order(page,order);
     unset_page_buddy(page);
+    //cprintf("zone.area[%d].n_free: %d -> ",zone.area[order].n_free);
     zone.area[order].n_free -= 1;
+    //cprintf("%d\n",zone.area[order].n_free);
 }
 static inline void add_to_free_list(struct page* page,order_t order){
+    //cprintf("add_to_free_list: order: %d\t",order);
     struct free_area* area = &zone.area[order];
+    set_page_buddy(page,order);
     list_add(&page->lru,&area->free_list);
+    //cprintf("zone.area[%d].n_free: %d -> ",order,zone.area[order].n_free);
     area->n_free += 1;
+    //cprintf("%d\n",zone.area[order].n_free);
 }
 
 static void free_pages_core(pg_idx_t pfn,order_t order){
+    //cprintf("free_pages_core: pg_idx: %d, order: %d\n",pfn,order);
+
     uint32_t n_pages = 1 << order;
     struct page * begin = PFn2PAGE(pfn);
     const struct page * const end = begin + n_pages;
@@ -82,15 +91,15 @@ static void free_pages(pg_idx_t begin, pg_idx_t end){
  * @param order 
  */
 static inline void free_one_page(struct page * page, pg_idx_t pg_idx, order_t order){
-    while(order < MAX_ORDER){
+    while(order < MAX_ORDER - 1){
         // 寻找它的buddy 验证对于buddy是否可释放
         pg_idx_t buddy_page_idx = _find_buddy_pfn(pg_idx, order);
         struct page * buddy_page = page + (buddy_page_idx - pg_idx);
         // 如果buddy不可释放 退出
         if(!page_is_buddy(page, buddy_page,order))
             break;
-
-        list_del(&buddy_page->lru);
+        del_page_from_free_list(buddy_page,order);
+        //list_del(&buddy_page->lru);
         zone.area[order].n_free -= 1;
         pg_idx_t combined_pg_idx = pg_idx & buddy_page_idx;
         page = page + (combined_pg_idx - pg_idx);
@@ -111,6 +120,12 @@ void alloc_init(void){
         free_area_ptr->n_free = 0;
         INIT_LIST_HEAD(&free_area_ptr->free_list);
     }
+    /*
+    for(int i = pg_range.begin; i < pg_range.end;++i){
+        add_to_free_list(pages+i,0);
+    }
+    */
+    //cprintf("Free page range: %d - %d\n",pg_range.begin, pg_range.end);
     free_pages(pg_range.begin,pg_range.end);
 
     log_alloc_system_info();
