@@ -1,6 +1,6 @@
 #ifndef KERNEL_H
 #define KERNEL_H
-
+#include "compiler_types.h"
 #include "build_bug.h"
 
 /**

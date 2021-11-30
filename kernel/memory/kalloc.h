@@ -15,6 +15,6 @@ void alloc_init(void);
 void log_alloc_system_info(void);
 
 void* kalloc(size_t size);
-void free(void *ptr);
+void kfree(void *ptr);
 
 #endif // KALLOC_H

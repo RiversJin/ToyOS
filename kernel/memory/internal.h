@@ -18,14 +18,14 @@ static inline void set_page_order(struct page *page, order_t order){
     page->flags |= order_in_flags;
 }
 
-static inline order_t get_buddy_order(struct page *page){
+static inline order_t get_page_order(struct page *page){
     return (order_t)(page->flags >> 56);
 }
 
 static inline bool page_is_buddy(struct page *page,struct page *buddy_page,order_t order){
     if(buddy_page->_mapcount != PAGE_BUDDY_MAPCOUNT_VALUE) return false;
 
-    if(get_buddy_order(buddy_page)!=order) return false;
+    if(get_page_order(buddy_page)!=order) return false;
 
     if(get_page_refcount(buddy_page)!=0 ) return false;
 
