@@ -16,5 +16,10 @@ void log_alloc_system_info(void);
 
 void* kalloc(size_t size);
 void kfree(void *ptr);
+int kalloc_pages(struct page** page,pg_idx_t* pfn,int pages_n);
+int kalloc_one_page(struct page** page,pg_idx_t* pfn);
+void kfree_page(pg_idx_t pfn);
+void kfree(void *ptr);
+
 
 #endif // KALLOC_H

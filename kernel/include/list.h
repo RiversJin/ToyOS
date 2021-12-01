@@ -340,7 +340,7 @@ static inline void list_splice_tail_init(struct list_head *list,struct list_head
  * @member: 结构体中,list_head的成员名
  */
 #define list_first_entry(ptr,type,member) \
-        list_entry((ptr->next),type,member)
+        list_entry(((ptr)->next),type,member)
 /**
  * @brief 取得链表中最后一个元素
  * 

@@ -31,7 +31,7 @@ void log_alloc_system_info(void){
     cprintf("Total free pages: %d\n",free_pages);
 }
 
-static inline void free_one_page(struct page * page, pg_idx_t pg_idx, order_t order);
+static inline void _free_one_page(struct page * page, pg_idx_t pg_idx, order_t order);
 
 
 static inline void del_page_from_free_list(struct page* page,order_t order){
@@ -60,7 +60,7 @@ static inline void add_to_free_list(struct page* page,order_t order){
  * @param pfn 
  * @param order 
  */
-static void free_page(pg_idx_t pfn,order_t order){
+static void _free_page(pg_idx_t pfn,order_t order){
     //cprintf("free_pages_core: pg_idx: %d, order: %d\n",pfn,order);
 
     uint32_t n_pages = 1 << order;
@@ -71,7 +71,7 @@ static void free_page(pg_idx_t pfn,order_t order){
         set_page_unused(ptr);
         set_page_refcount(ptr, 0);
     }
-    free_one_page(begin,pfn,order);
+    _free_one_page(begin,pfn,order);
 }
 /**
  * @brief 释放指定范围的页
@@ -79,14 +79,14 @@ static void free_page(pg_idx_t pfn,order_t order){
  * @param begin 
  * @param end 
  */
-static void free_pages(pg_idx_t begin, pg_idx_t end){
+static void _free_pages_range(pg_idx_t begin, pg_idx_t end){
     order_t order;
     while(begin < end){
         order = MIN(MAX_ORDER - 1UL,__ffs(begin));
         while((begin + (1UL << order)) > end) {
             --order;
         }
-        free_page(begin,order);
+        _free_page(begin,order);
         begin += (1UL << order);
     }
 }
@@ -97,7 +97,7 @@ static void free_pages(pg_idx_t begin, pg_idx_t end){
  * @param pg_idx 
  * @param order 
  */
-static inline void free_one_page(struct page * page, pg_idx_t pg_idx, order_t order){
+static inline void _free_one_page(struct page * page, pg_idx_t pg_idx, order_t order){
     while(order < MAX_ORDER - 1){
         // 寻找它的buddy 验证对于buddy是否可释放
         pg_idx_t buddy_page_idx = _find_buddy_pfn(pg_idx, order);
@@ -106,8 +106,6 @@ static inline void free_one_page(struct page * page, pg_idx_t pg_idx, order_t or
         if(!page_is_buddy(page, buddy_page,order))
             break;
         del_page_from_free_list(buddy_page,order);
-        //list_del(&buddy_page->lru);
-        zone.area[order].n_free -= 1;
         pg_idx_t combined_pg_idx = pg_idx & buddy_page_idx;
         page = page + (combined_pg_idx - pg_idx);
         pg_idx = combined_pg_idx;
@@ -126,15 +124,10 @@ void alloc_init(void){
         free_area_ptr->n_free = 0;
         INIT_LIST_HEAD(&free_area_ptr->free_list);
     }
-    /*
-    for(int i = pg_range.begin; i < pg_range.end;++i){
-        add_to_free_list(pages+i,0);
-    }
-    */
-    //cprintf("Free page range: %d - %d\n",pg_range.begin, pg_range.end);
-    free_pages(pg_range.begin,pg_range.end);
-
+    
+    _free_pages_range(pg_range.begin,pg_range.end);
     log_alloc_system_info();
+    cprintf("memory manage system initialized.\n");
 }
 /**
  * @brief 如果获得的内存块比需要的大,将此内存快分裂,多余的还回去
@@ -165,7 +158,7 @@ static inline struct page* _rm_smallest(order_t order){
         // 如果此阶没有可用内存 尝试更高的阶
         if(list_is_empty(&area->free_list))
             continue;
-        struct page* page = list_entry(&area->free_list,struct page,lru);
+        struct page* page = list_first_entry(&area->free_list,struct page,lru);
         // 从可用链表中取出来
         del_page_from_free_list(page,current_order);
         _expand(page,order,current_order);
@@ -182,17 +175,40 @@ void* kalloc(size_t size){
     if(size % PGSIZE != 0){
         pages_n += 1;
     }
-    order_t order = __fls(pages_n);
-    cprintf("kalloc: require size: %llu \t order: %d\n",size,order);
-    return _rm_smallest(order);
+    struct page* page;
+    pg_idx_t pg_idx;
+    if(kalloc_pages(&page,&pg_idx,pages_n) != 0){
+        return NULL;
+    }
+    return (void*)PA2VA(PFn2PHY(pg_idx));
 }
-void* kalloc_one_page(void){
-    return _rm_smallest(0);
+int kalloc_pages(struct page** page,pg_idx_t* pfn,int pages_n){
+    order_t order;
+    if((pages_n&(pages_n-1)) == 0){
+        order = __ffs(pages_n);
+    }else{
+        order = __fls(pages_n) + 1;
+    }
+    struct page* _page;
+    pg_idx_t _pfn;
+    _page = _rm_smallest(order);
+    set_page_order(_page,order);
+    _pfn = _page - pages;
+    if(_page == NULL)return -1;
+    *page = _page;
+    *pfn = _pfn;
+    return 0;
 }
-
+int kalloc_one_page(struct page** page,pg_idx_t* pfn){
+    return kalloc_pages(page,pfn,0);
+}
+void kfree_page(pg_idx_t pfn){
+    order_t order = get_page_order(pages + pfn);
+    _free_page(pfn,order);
+}
 void kfree(void *ptr){
     pg_idx_t pfn = PHY2PFn((void*)VA2PA(ptr));
     struct page* page = pages+pfn;
     order_t order = get_page_order(page);
-    free_one_page(page,pfn,order);
+    _free_one_page(page,pfn,order);
 }
