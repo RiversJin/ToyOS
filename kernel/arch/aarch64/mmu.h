@@ -27,7 +27,7 @@
 
 #define MM_TYPE_INVALID 0b00
 #define MM_TYPE_BLOCK 0b01
-#define MM_TYPE_TABLE 0b11L
+#define MM_TYPE_TABLE 0b11
 
 /* Memory Attributes 控制这个页表项对应的内存区域的内存类型,缓存策略 */
 #define MA_DEVICE_nGnRnE_Flags 0x0   // 设备内存 禁止聚集(non Gathering) 禁止重排(non re-order) 禁止提前的写入ACK(Early Write Acknowledgement)
@@ -51,6 +51,9 @@
 #define AP_PRIVILEGED 0   // 特权级别才可访问
 #define AP_UNPREVILEGED 1 // 允许EL0访问
 
+#define PTE_VALID 1
+#define PTE_BLOCK MM_TYPE_BLOCK
+#define PTE_PAGE MM_TYPE_TABLE
 #define PTE_KERNEL (AP_PRIVILEGED << 6)
 #define PTE_USER (AP_UNPREVILEGED << 6)
 #define PTE_RW (AP_RW << 7)
@@ -129,4 +132,32 @@
 
 /* 在System Control Register 中 使能MMU的值 */
 #define SCTLR_MMU_ENABLED               (1 << 0)
+
+
+/* 有关页表项的一些内容 */
+/*
+ * See Chapter 12 of ARM Cortex-A Series Programmer's Guide for ARMv8-A
+ * and Chapter D4(D4.2, D4.3) of Arm Architecture Reference Manual Armv8, for
+ * Armv8-A architecture profile.
+ */
+/*
+ * A virtual address 'va' has a four-part structure as follows:
+ * +-----9-----+-----9-----+-----9-----+-----9-----+---------12---------+
+ * |  Level 0  |  Level 1  |  Level 2  |  Level 3  | Offset within Page |
+ * |   Index   |   Index   |   Index   |   Index   |                    |
+ * +-----------+-----------+-----------+-----------+--------------------+
+ *  \PTX(va, 0)/\PTX(va, 1)/\PTX(va, 2)/\PTX(va, 3)/
+ */
+
+
+#define ENTRYSZ (PGSIZE / 8)
+
+#define PGSIZE (1 << L3SHIFT)
+#define BKSIZE (1 << L2SHIFT)
+// 获得指定虚拟地址中的一段
+#define PXMASK 0x1FF // 9位
+#define PXSHIFT(level) (PAGE_SHIFT+(9*(3 - level)))
+#define PX(level, va) ((uint64_t)(va) >> (PXSHIFT(level)) & PXMASK)
+
+
 #endif // MMU_H

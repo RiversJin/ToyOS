@@ -60,5 +60,8 @@ static inline void delay(int32_t count){
     );
 }
 
+typedef uint64_t pte_t;
+typedef uint64_t * pagetable_t;
+
 
 #endif // ARM_Hf
