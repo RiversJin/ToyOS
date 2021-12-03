@@ -87,14 +87,14 @@ static void vprintfmt(void (*putch)(int), const char *fmt, va_list ap){
         }
     }
 }
-
+__attribute__((format(printf,1,2)))
 void cprintf(const char *fmt, ...){
     va_list ap;
     va_start(ap, fmt);
     vprintfmt(uart_putchar, fmt,ap);
     va_end(ap);
 }
-
+__attribute__((format(printf,1,2)))
 __attribute__((noreturn))
 void panic(const char *fmt, ...){
     va_list ap;
