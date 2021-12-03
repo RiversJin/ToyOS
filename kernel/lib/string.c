@@ -1,11 +1,20 @@
 #include "include/types.h"
 
-void* memset(void* v, int c, size_t n)
+/**
+ * memset - Fill a region of memory with the given value
+ * @s: Pointer to the start of the area.
+ * @c: The byte to fill the area with
+ * @count: The size of the area.
+ *
+ * Do not use memset() to access IO space, use memset_io() instead.
+ */
+void *memset(void *s, int c, size_t count)
 {
-    char* p = (char*)v;
-    int m = n;
-    while (--m >= 0) *p++ = c;
-    return v;
+	char *xs = s;
+
+	while (count--)
+		*xs++ = c;
+	return s;
 }
 
 void *memcpy(void *dest, const void *src, size_t count)

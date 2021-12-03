@@ -1,6 +1,7 @@
 #ifndef VM_H
 #define VM_H
 #include <stdbool.h>
+#include <stddef.h>
 #include "arch/aarch64/arm.h"
 
 /**
@@ -15,7 +16,7 @@
 pte_t* walk(pagetable_t pagetable_ptr, uint64_t va,bool alloc);
 
 /**
- * @brief 给定一个页表和一个虚拟地址,返回其物理地址
+ * @brief 给定一个页表和一个虚拟地址,返回其物理地址 只用于用户态的页表
  * 
  * @param pagetable_ptr 页表指针 
  * @param va 虚拟地址

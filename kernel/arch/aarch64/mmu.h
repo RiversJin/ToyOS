@@ -3,6 +3,9 @@
 
 #define PAGE_SHIFT 12
 #define PGSIZE (1<<PAGE_SHIFT)
+
+#define PGROUNDUP(sz)  (((sz)+PGSIZE-1) & ~(PGSIZE-1))
+#define PGROUNDDOWN(a) (((a)) & ~(PGSIZE-1))
 /* 
     在AARCH64的MMU页表项中,在4K页粒度下,格式如下
     |63 --- 52|51 --- 48|47 --- 12|11 --- 2| 1 | 0|
@@ -152,8 +155,6 @@
 
 #define ENTRYSZ (PGSIZE / 8)
 
-#define PGSIZE (1 << L3SHIFT)
-#define BKSIZE (1 << L2SHIFT)
 // 获得指定虚拟地址中的一段
 #define PXMASK 0x1FF // 9位
 #define PXSHIFT(level) (PAGE_SHIFT+(9*(3 - level)))
