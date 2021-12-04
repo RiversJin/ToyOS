@@ -31,6 +31,7 @@
 #define MM_TYPE_INVALID 0b00
 #define MM_TYPE_BLOCK 0b01
 #define MM_TYPE_TABLE 0b11
+#define MM_TYPE_PAGE  0b11
 
 /* Memory Attributes 控制这个页表项对应的内存区域的内存类型,缓存策略 */
 #define MA_DEVICE_nGnRnE_Flags 0x0   // 设备内存 禁止聚集(non Gathering) 禁止重排(non re-order) 禁止提前的写入ACK(Early Write Acknowledgement)
@@ -56,7 +57,8 @@
 
 #define PTE_VALID 1
 #define PTE_BLOCK MM_TYPE_BLOCK
-#define PTE_PAGE MM_TYPE_TABLE
+#define PTE_TABLE MM_TYPE_TABLE
+#define PTE_PAGE MM_TYPE_PAGE
 #define PTE_KERNEL (AP_PRIVILEGED << 6)
 #define PTE_USER (AP_UNPREVILEGED << 6)
 #define PTE_RW (AP_RW << 7)
