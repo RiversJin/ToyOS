@@ -1,10 +1,18 @@
 #include <stdarg.h>
 #include <stdint.h>
-
+#include <stddef.h>
+#include <stdbool.h>
 #include "arch/aarch64/board/raspi3/uart.h"
+#include "sync/spinlock.h"
 
 extern void uart_putchar(int c);
 extern void uart_init();
+
+volatile int panicked = 0;
+static struct print_lock{
+    struct spinlock lock;
+    bool locking;
+} print_lock;
 
 /**
  * @brief 初始化中断 在这里就是初始化串口
@@ -12,6 +20,8 @@ extern void uart_init();
  */
 void console_init(void){
     uart_init();
+    init_spin_lock(&print_lock.lock,"print spin lock");
+    print_lock.locking = true;
 }
 /**
  * @brief 向串口打印数字
@@ -87,20 +97,33 @@ static void vprintfmt(void (*putch)(int), const char *fmt, va_list ap){
         }
     }
 }
+void panic(const char *fmt, ...);
+
 __attribute__((format(printf,1,2)))
 void cprintf(const char *fmt, ...){
+    bool locking = print_lock.locking;
+    if(locking)
+        acquire_spin_lock(&print_lock.lock);
+    if(fmt == NULL){
+        panic("%s: fmt is NULL",__FUNCTION__);
+    }
     va_list ap;
     va_start(ap, fmt);
     vprintfmt(uart_putchar, fmt,ap);
     va_end(ap);
+    if(locking){
+        release_spin_lock(&print_lock.lock);
+    }
 }
 __attribute__((format(printf,1,2)))
 __attribute__((noreturn))
 void panic(const char *fmt, ...){
+    print_lock.locking = false;
     va_list ap;
     va_start(ap, fmt);
     vprintfmt(uart_putchar, fmt,ap);
     va_end(ap);
     cprintf("\t%s:%d: kernel panic.\n", __FILE__, __LINE__);
+    panicked = true;
     while(1);  
 }

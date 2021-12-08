@@ -4,6 +4,10 @@
 #include "uart.h"
 #include "gpio.h"
 #include "../../arm.h"
+#include "sync/spinlock.h"
+
+extern volatile int panicked;
+static struct spinlock uart_tx_lock;
 /**
  * @brief 初始化串口
  * 
@@ -31,6 +35,8 @@ void uart_init(void)
     put32(AUX_MU_MCR_REG, 0);    // 设置RTS永远为高电平
     put32(AUX_MU_BAUD_REG, 270); // 设置波特率为115200
     put32(AUX_MU_CNTL_REG, 3);   // 重新使能串口传输
+
+    init_spin_lock(&uart_tx_lock,"uart_tx_lock");
 }
 /**
  * @brief 向串口发送一个字符
@@ -39,9 +45,14 @@ void uart_init(void)
  */
 void uart_putchar(int c)
 {
+    acquire_spin_lock(&uart_tx_lock);
+    if(panicked){
+        while(1);
+    }
     while (!(get32(AUX_MU_LSR_REG) & 0x20))
         ;
     put32(AUX_MU_IO_REG, c & 0xff);
+    release_spin_lock(&uart_tx_lock);
 }
 /**
  * @brief 从串口读取一个字符

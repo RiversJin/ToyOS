@@ -13,5 +13,5 @@ static inline uint64_t cpuid(){
     return r_mpidr() & 0xFF;
 }
 
-void awake_ap_by_spintable();
+void init_awake_ap_by_spintable();
 #endif //PROC_H
