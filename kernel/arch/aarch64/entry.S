@@ -7,22 +7,10 @@
 .global _entry
 
 _entry:
-    // 读取当前CPUID,如果id不为0,使其跳至halt休眠
-    // mrs -- Move the contents of a special register to a general-purpose register.
-    // mpidr_el1 用来读取核心ID用
-    mrs     x1, mpidr_el1
-    and     x1, x1, #3 // 只取[2:0]即可拿到ID
-    cbnz    x1, halt // Compare and Branch on Non-Zero 若不为0,跳转至指定位置 
     mrs     x2, CurrentEL // 读取当前异常级别 在此寄存器中 我们需要的是[3:2]
     and     x2, x2, #0b1100
     cmp     x2, #0b1000
     beq     switch_to_el1_from_el2 // branch on equal
-    bgt     switch_to_el2_from_el3
-    b       halt // 这种是未定义情况 让cpu halt住方便调试
-
-halt:
-    wfe     // wait for event 休眠CPU
-    b halt
 
 switch_to_el2_from_el3:
     // 向scr_el3写入0101_1011_0001 0x5B1
@@ -75,11 +63,17 @@ jump_to_main:
     /* 使能MMU */
     mrs     x5, sctlr_el1
     orr     x5, x5, #SCTLR_MMU_ENABLED
-    msr     sctlr_el1, x5     
+    msr     sctlr_el1, x5 
+    isb     //修改页表后要指令同步
 
+    msr     spsel, #1
+    mrs     x6, mpidr_el1
+    and     x6, x6, #0xFF
+    ldr     x7, =(STACK_SIZE)
+    mul     x7, x7, x6
     ldr     x0, =_entry
-    mov     sp, x0 // 先暂时将_entry作为内核栈的顶部
-    
+    sub     x0, x0, x7
+    mov     sp, x0
     ldr     x1, =main
     br      x1
 

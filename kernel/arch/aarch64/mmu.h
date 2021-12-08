@@ -3,6 +3,7 @@
 
 #define PAGE_SHIFT 12
 #define PGSIZE (1<<PAGE_SHIFT)
+#define STACK_SIZE (PGSIZE*2)
 
 #define PGROUNDUP(sz)  (((sz)+PGSIZE-1) & ~(PGSIZE-1))
 #define PGROUNDDOWN(a) (((a)) & ~(PGSIZE-1))

@@ -60,6 +60,15 @@ static inline void delay(int32_t count){
     );
 }
 
+static inline uint64_t r_mpidr(){
+    uint64_t value;
+    asm volatile(
+        "mrs %0, mpidr_el1"
+        : "=r"(value)
+    );
+    return value;
+}
+
 typedef uint64_t pte_t;
 typedef uint64_t * pagetable_t;
 
