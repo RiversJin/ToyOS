@@ -1,18 +1,21 @@
 #ifndef LINKAGE_H
 #define LINKAGE_H
 
+#ifndef ASM_NL
+#define ASM_NL		 ;
+#endif
 
-#ifdef __ASSEMBLY__
+#ifdef __ASSEMBLER__
 
     #ifndef ENTRY
-    #define ENTRY(name) \
-        .global name \
+    #define ENTRY(name) ASM_NL \
+        .global name ASM_NL\
         name:
     #endif
 
     #ifndef WEAK
     #define WEAK(name) \
-        .weak name \
+        .weak name ASM_NL \
         name:
     #endif
 
@@ -23,7 +26,7 @@
 
     #ifndef ENDPROC
     #define ENDPROC(name) \
-        .type name, @function \
+        .type name, @function ASM_NL \
         END(name)
     #endif
 

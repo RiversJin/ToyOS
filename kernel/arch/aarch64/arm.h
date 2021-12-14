@@ -21,7 +21,27 @@ static inline void put32(uint64_t ptr, uint32_t val){
 static inline uint32_t get32(uint64_t ptr){
     return *(volatile uint32_t *)ptr;
 }
-
+static inline uint64_t read_esr_el1(){
+    uint64_t reg;
+    asm volatile (
+        "mrs %0, esr_el1"
+        : "=r" (reg)
+    );
+    return reg;
+}
+static inline uint64_t read_elr_el(){
+    uint64_t reg;
+    asm volatile (
+        "mrs %0, elr_el1"
+        : "=r" (reg)
+    );
+    return reg;
+}
+static inline void isb(){
+    asm volatile (
+        "isb"
+    );
+}
 /**
  * @brief 设置EL1的异常处理函数表基址
  * 
