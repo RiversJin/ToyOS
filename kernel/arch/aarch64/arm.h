@@ -89,6 +89,64 @@ static inline uint64_t r_mpidr(){
     return value;
 }
 
+/**
+ * @brief 读取时钟频率
+ * 
+ * @return uint64_t 
+ */
+static inline uint64_t r_cntfrq_el0(){
+    uint64_t value;
+    asm volatile(
+        "mrs %0, cntfrq_el0"
+        : "=r" (value)
+    );
+    return value;
+}
+
+static inline uint64_t r_cntp_ctl_el0(){
+    uint64_t value;
+    asm volatile (
+        "mrs %0, cntp_ctl_el0"
+        : "=r"(value)
+    );
+    return value;
+}
+static inline void l_cntp_ctl_el0(uint64_t value){
+    asm volatile (
+        "msr cntp_ctl_el0,%0"
+        :
+        :"r"(value)
+    );
+}
+static inline uint64_t r_cntp_tval_el0(){
+    uint64_t value;
+    asm volatile (
+        "mrs %0, cntp_tval"
+        : "=r"(value)
+    );
+    return value;
+}
+static inline void l_cntp_tval_el0(uint64_t value){
+    asm volatile (
+        "msr cntp_tval_el0,%0"
+        :
+        :"r"(value)
+    );
+}
+
+
+static inline void clear_daif()
+{
+    asm volatile("msr daif, %[x]" : : [x] "r"(0));
+}
+
+
+static inline void set_daif()
+{
+    asm volatile("msr daif, %[x]" : : [x] "r"(0xF << 6));
+}
+
+
 typedef uint64_t pte_t;
 typedef uint64_t * pagetable_t;
 
