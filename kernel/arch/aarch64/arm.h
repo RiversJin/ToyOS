@@ -146,6 +146,16 @@ static inline void set_daif()
     asm volatile("msr daif, %[x]" : : [x] "r"(0xF << 6));
 }
 
+static inline uint32_t get_daif(){
+    uint32_t value;
+    asm volatile(
+        "mrs %0, daif"
+        : "=r" (value)
+    );
+    return value;
+}
+
+
 
 typedef uint64_t pte_t;
 typedef uint64_t * pagetable_t;

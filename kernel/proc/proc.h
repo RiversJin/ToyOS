@@ -2,6 +2,7 @@
 #define PROC_H
 #include <stdint.h>
 #include "arch/aarch64/arm.h"
+#include "arch/aarch64/include/cpu.h"
 #include "memory/memory.h"
 
 /**
@@ -13,5 +14,14 @@ static inline uint64_t cpuid(){
     return r_mpidr() & 0xFF;
 }
 
+/**
+ * @brief 返回当前cpu的信息
+ * 
+ * @return struct cpu* 
+ */
+struct cpu* mycpu(void);
+
 void init_awake_ap_by_spintable();
+
+void init_cpu_info();
 #endif //PROC_H

@@ -15,5 +15,10 @@ void timer_init();
  */
 void timer_tick_in(uint64_t us);
 
+/**
+ * @brief 充值计时器 (timer_tick_in的语法糖而已)
+ * 
+ */
+void timer_reset();
 
 #endif //TIMER_H

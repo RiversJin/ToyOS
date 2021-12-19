@@ -13,12 +13,14 @@ void main(){
         alloc_init();
         exception_handler_init();
 
-        //init_awake_ap_by_spintable();
-        timer_init();
-        enable_interrupt();
+        init_awake_ap_by_spintable();
+        
     }
+
+    timer_init();
+    enable_interrupt();
     cprintf("main: [CPU %d] started.\n", cpuid());
-    uint32_t value;
+    
     while(1){
         
 

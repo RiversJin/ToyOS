@@ -3,12 +3,14 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "arch/aarch64/include/cpu.h"
+#include "proc/proc.h"
 struct spinlock {
     bool locked;
 
     //调试用
     const char *name; // 锁名称
-    int64_t cpuid; // 此锁当前由哪个cpu持有
+    struct cpu* cpu; // 此锁当前由哪个cpu持有
 };
 /**
  * @brief 判断此自旋锁是否由当前cpu持有
@@ -38,4 +40,8 @@ void release_spin_lock(struct spinlock *lock);
  */
 void init_spin_lock(struct spinlock *lock,const char *name);
 
+
+void push_off(void);
+
+void pop_off(void);
 #endif //SPINLOCK_H
