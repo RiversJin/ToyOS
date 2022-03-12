@@ -36,7 +36,7 @@ void pop_off(void){
 
 void acquire_spin_lock(struct spinlock *lock){
     push_off();
-    if(is_current_cpu_held(lock)){
+    if(is_current_cpu_holding_spin_lock(lock)){
         panic("acquire_spin_lock: the lock (%s) is already held by %lu \n",lock->name,cpuid());
     }
     while(__sync_lock_test_and_set(&lock->locked,true) != false);
@@ -45,7 +45,7 @@ void acquire_spin_lock(struct spinlock *lock){
 }
 
 void release_spin_lock(struct spinlock *lock){
-    if(!is_current_cpu_held(lock)){
+    if(!is_current_cpu_holding_spin_lock(lock)){
         panic("release_spin_lock: the lock (%s) held by %lu can't be released by %lu \n",lock->name,lock->cpu->cpuid,cpuid());
     }
     lock->cpu = NULL;
@@ -54,6 +54,6 @@ void release_spin_lock(struct spinlock *lock){
     pop_off();
 }
 
-bool is_current_cpu_held(struct spinlock *lock){
+bool is_current_cpu_holding_spin_lock(struct spinlock *lock){
     return lock->locked && lock->cpu == mycpu();
 }

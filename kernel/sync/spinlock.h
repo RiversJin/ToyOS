@@ -19,7 +19,7 @@ struct spinlock {
  * @return true 
  * @return false 
  */
-bool is_current_cpu_held(struct spinlock *lock);
+bool is_current_cpu_holding_spin_lock(struct spinlock *lock);
 /**
  * @brief 尝试获得一个锁
  * 
