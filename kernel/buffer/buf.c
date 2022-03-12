@@ -1,7 +1,7 @@
 #include "buf.h"
 #include "sync/spinlock.h"
 #include "sync/sleeplock.h"
-
+#include "driver/mmc/sd.h"
 struct bcache {
     struct spinlock lock;
     struct buf buf[NBUF];
@@ -41,7 +41,7 @@ static struct buf* bget(uint32_t dev, uint32_t blockno){
         }
     }
 
-    // 如果没有命中 首先 从lru中找一个最近使用最少的buffer 希望这个bufer不脏 
+    // 如果没有命中 首先 从lru中找一个最近使用最少的buffer 这个bufer不脏 
     for(struct buf* b = bcache.head.prev; b != &bcache.head; b = b->prev){
         if( b->refcnt == 0 && !(b->flags & BUF_DIRTY)){
             b->dev = dev;
@@ -68,4 +68,21 @@ void bunpin(struct buf* b){
     acquire_spin_lock(&bcache.lock);
     b->refcnt-=1;
     release_spin_lock(&bcache.lock);
+}
+
+void bwrite(struct buf* b){
+    if(!is_current_cpu_holing_sleep_lock(&b->lock)){
+        panic("bwrite: buf not locked.\n");
+    }
+    b -> flags |= BUF_DIRTY;
+    sd_rw(b);
+}
+
+struct buf* bread(uint32_t dev, uint32_t blockno){
+    const uint32_t LBA = 0x20800; //TODO: 这个地方记得改为动态解析 虽然硬编码也不是不行...
+    struct buf* b = bget(dev,blockno + LBA);
+    if(!(b->flags & BUF_VALID)){
+        sd_rw(b);
+    }
+    return b;
 }
