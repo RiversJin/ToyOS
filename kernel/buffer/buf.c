@@ -2,6 +2,7 @@
 #include "sync/spinlock.h"
 #include "sync/sleeplock.h"
 #include "driver/mmc/sd.h"
+#include "console.h"
 struct bcache {
     struct spinlock lock;
     struct buf buf[NBUF];
@@ -15,7 +16,7 @@ void binit(){
     bcache.head.prev = &bcache.head;
     bcache.head.next = &bcache.head;
 
-    for(struct buf* b = &bcache.buf; b < bcache.buf + NBUF; ++b){
+    for(struct buf* b = bcache.buf; b < bcache.buf + NBUF; ++b){
         b->next = bcache.head.next;
         b->prev = &bcache.head;
 

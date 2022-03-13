@@ -35,6 +35,6 @@ void release_sleep_lock(struct sleeplock *lock);
  * @return true 
  * @return false 
  */
-bool is_current_cpu_holing_sleep_lock(struct spinlock *lock);
+bool is_current_cpu_holing_sleep_lock(struct sleeplock *lock);
 
 #endif /* SLEEPLOCK_H */

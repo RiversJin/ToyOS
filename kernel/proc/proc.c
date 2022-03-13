@@ -1,5 +1,5 @@
 #include "proc.h"
-#include "param.h"
+#include "include/param.h"
 
 struct cpu cpus[NCPU];
 

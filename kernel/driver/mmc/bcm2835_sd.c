@@ -2,13 +2,13 @@
 
 #include "sd.h"
 
-#include "arm.h"
+#include "arch/aarch64/arm.h"
 #include "console.h"
 #include "arch/aarch64/board/raspi3/gpio.h"
 #include "arch/aarch64/board/raspi3/mbox.h"
-#include "proc.h"
-#include "sleeplock.h"
-#include "string.h"
+#include "proc/proc.h"
+#include "sync/sleeplock.h"
+#include "lib/string.h"
 
 // Private functions
 static void _sd_start(struct buf* b);
@@ -664,11 +664,11 @@ sd_intr()
 void
 sd_rw(struct buf* b)
 {
-    acquiresleep(&b->lock);
+    acquire_sleep_lock(&b->lock);
     _sd_start(b);
     b->flags &= ~BUF_DIRTY;
     b->flags |= BUF_VALID;
-    brelse(b);
+    brelease(b);
 }
 
 /* SD card test and benchmark. */

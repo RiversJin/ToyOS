@@ -42,6 +42,15 @@ static inline void isb(){
         "isb"
     );
 }
+static inline void disb(){
+    asm volatile("dsb sy; isb");
+}
+
+static inline uint64_t timestamp(){
+    uint64_t t;
+    asm volatile("mrs %[cnt], cntpct_el0" : [cnt] "=r"(t));
+    return t;
+}
 /**
  * @brief 设置EL1的异常处理函数表基址
  * 
@@ -155,6 +164,18 @@ static inline uint32_t get_daif(){
     return value;
 }
 
+static inline void delayus(uint32_t n){
+    uint64_t f,t,r;
+    //首先 获得当前计数器频率
+    asm volatile("mrs %[freq], cntfrq_el0" : [freq] "=r"(f));
+    //获得当前计数器的值
+    asm volatile("mrs %[cnt], cntpct_el0" : [cnt] "=r"(t));
+    
+    t += f / 1000000 * n;
+    do {
+        asm volatile("mrs %[cnt], cntpct_el0" : [cnt] "=r"(r));
+    } while (r < t);
+}
 
 
 typedef uint64_t pte_t;

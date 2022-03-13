@@ -2,6 +2,7 @@
 #define BUF_H
 #include "fs/fs.h"
 #include "include/stdint.h"
+#include "sync/sleeplock.h"
 
 #define BUF_VALID 0x1 // 0b1
 #define BUF_DIRTY 0x2 // 0b10
