@@ -48,6 +48,14 @@ void *memmove(void *dest, const void *src, size_t count)
 	return dest;
 }
 
-int memcmp(const void *s1, const void *s2, size_t count){
-	return __builtin_memcmp(s1,s2,count);
+int memcmp(const void *v1, const void *v2, size_t count){
+	const uint8_t* s1 = (const uint8_t*)v1;
+    const uint8_t* s2 = (const uint8_t*)v2;
+
+    while (count-- > 0) {
+        if (*s1 != *s2) return (int)*s1 - (int)*s2;
+        s1++, s2++;
+    }
+
+    return 0;
 }

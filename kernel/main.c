@@ -15,14 +15,16 @@ void main(){
         console_init();
         alloc_init();
         exception_handler_init();
-        binit();
+        timer_init();
+        enable_interrupt();
+
         sd_init();
         init_awake_ap_by_spintable();
         
     }
-
-    timer_init();
-    enable_interrupt();
+    
+    // timer_init();
+    // enable_interrupt();
     cprintf("main: [CPU %d] started.\n", cpuid());
     
     while(1){

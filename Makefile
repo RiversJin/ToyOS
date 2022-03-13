@@ -17,7 +17,7 @@ KERNEL_ELF := $(BUILD_DIR)/kernel8.elf
 KERNEL_IMG := $(BUILD_DIR)/kernel8.img
 SD_IMG := $(BUILD_DIR)/sd.img
 
-all: $(KERNEL_IMG)
+all: $(SD_IMG)
 
 SRCS := $(shell find $(SRC_DIR) -name *.c -or -name *.S)
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)

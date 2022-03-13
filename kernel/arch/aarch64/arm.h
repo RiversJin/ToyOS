@@ -46,6 +46,11 @@ static inline void disb(){
     asm volatile("dsb sy; isb");
 }
 
+static inline void dccivac(void* p, int n)
+{
+    while (n--) asm volatile("dc civac, %[x]" : : [x] "r"(p + n));
+}
+
 static inline uint64_t timestamp(){
     uint64_t t;
     asm volatile("mrs %[cnt], cntpct_el0" : [cnt] "=r"(t));

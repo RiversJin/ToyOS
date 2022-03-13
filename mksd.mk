@@ -27,11 +27,11 @@ $(BOOT_IMG): $(KERNEL_IMG) $(shell find boot/*)
 	$(foreach x, $^, mcopy -i $@ $(x) ::$(notdir $(x));)
 
 $(FS_IMG): $(shell find build/user/bin -type f)
+	mkdir -p build/tool
+	gcc -o build/tool/mkfs tool/mkfs/mkfs.c
 	$(info Our filesystem files: $^)
 	$(BUILD_DIR)/tool/mkfs $@ $^
 
-$(BUILD_DIR)/tool/mkfs: tool/mkfs/%.c
-	gcc -o $@ $^
 
 $(SD_IMG): $(FS_IMG) $(BOOT_IMG)
 	dd if=/dev/zero of=$@ seek=$(shell echo $$(($(SECTORS) - 1))) bs=$(SECTOR_SIZE) count=1

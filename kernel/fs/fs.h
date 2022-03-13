@@ -1,7 +1,7 @@
 #ifndef FS_H
 #define FS_H
-#include "include/stdint.h"
-#include "include/param.h"
+#include "../include/stdint.h"
+#include "../include/param.h"
 
 #define ROOTINO 1 
 #define BSIZE 512 // 块大小
