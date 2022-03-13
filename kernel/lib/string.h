@@ -15,4 +15,6 @@ void *memset(void *s, int c, size_t count);
 void *memcpy(void *dest, const void *src, size_t count);
 
 void *memmove(void *dest, const void *src, size_t count);
+
+int memcmp(const void *s1, const void *s2, size_t count);
 #endif // STRING_H

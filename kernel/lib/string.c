@@ -47,3 +47,7 @@ void *memmove(void *dest, const void *src, size_t count)
 	}
 	return dest;
 }
+
+int memcmp(const void *s1, const void *s2, size_t count){
+	return __builtin_memcmp(s1,s2,count);
+}
