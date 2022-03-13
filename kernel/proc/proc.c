@@ -2,6 +2,9 @@
 #include "include/param.h"
 
 struct cpu cpus[NCPU];
+struct process_table{
+    struct proc proc[NPROC];
+}process_table;
 
 static volatile uint64_t* _spintable = (uint64_t*)PA2VA(0xD8);
 extern void _entry();
