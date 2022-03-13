@@ -87,3 +87,21 @@ struct buf* bread(uint32_t dev, uint32_t blockno){
     }
     return b;
 }
+
+void brelease(struct buf* buf){
+    if(!is_current_cpu_holing_sleep_lock(&buf->lock)){
+        panic("brelease: buf not locked.\n");
+    }
+    release_sleep_lock(&buf->lock);
+    acquire_spin_lock(&bcache.lock);
+    buf->refcnt -= 1;
+    if(buf->refcnt == 0){
+        buf->next->prev = buf->prev;
+        buf->prev->next = buf->next;
+        buf->next = bcache.head.next;
+        buf->prev = &bcache.head;
+        bcache.head.next->prev = buf;
+        bcache.head.next = buf;
+    }
+    release_spin_lock(&bcache.lock);
+}
