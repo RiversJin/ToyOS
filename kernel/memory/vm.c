@@ -262,7 +262,7 @@ int copyout(pagetable_t pagetable, uint64_t dstva, char* src,  uint64_t len){
         memmove((pa + (dstva - va)),src,n);
         len -= n;
         src += n;
-        dstva += va + PGSIZE;
+        dstva = va + PGSIZE;
     }
     return 0;
 }
