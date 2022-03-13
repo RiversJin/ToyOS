@@ -37,4 +37,13 @@ void kvmmap(pagetable_t kernel_pagetable_ptr,uint64_t va, uint64_t pa, uint64_t 
  */
 int mappages(pagetable_t pagetable_ptr,uint64_t va, uint64_t pa, uint64_t size, int perm);
 
+pagetable_t uvmcreate(void);
+void uvminit(pagetable_t pagetable, uint8_t *src, uint8_t sz);
+uint64_t uvmalloc(pagetable_t pagetable,uint64_t oldsz, uint64_t newsz);
+uint64_t uvmdealloc(pagetable_t, uint64_t, uint64_t);
+int uvmcopy(pagetable_t, pagetable_t, uint64_t);
+void uvmfree(pagetable_t, uint64_t);
+void unmunmap(pagetable_t pagetable,uint64_t va,uint64_t npages, int do_free);
+void unmclear(uint64_t *pgdir, uint8_t *va);
+int copyout(pagetable_t pagetable, uint64_t dstva, char* src,  uint64_t len);
 #endif // VM_H
