@@ -66,7 +66,13 @@ void unmunmap(pagetable_t pagetable,uint64_t va,uint64_t npages, int do_free){
         *pte = 0;
     }
 }
-
+/**
+ * @brief 给定一个页表和一个虚拟地址,返回其物理地址 只用于用户态的页表
+ * 
+ * @param pagetable_ptr 页表指针 
+ * @param va 虚拟地址
+ * @return uint64_t 物理地址
+ */
 uint64_t walkaddr(pagetable_t pagetable_ptr,uint64_t va){
     pte_t* pte;
     if(!_check_MSB_valid(va)) return 0;
@@ -76,7 +82,16 @@ uint64_t walkaddr(pagetable_t pagetable_ptr,uint64_t va){
     if((*pte & PTE_USER) == 0) return 0;
     return (uint64_t)PA2VA(PTE_ADDR(*pte));
 }
-
+/**
+ * @brief 在指定页表上,创建va-pa的映射. 非零值代表失败(内存没地方了)
+ *        使用4级页表 不要用于内核页表(内核页表含有block项)
+ * @param pagetable_ptr 
+ * @param va 
+ * @param pa 
+ * @param size 
+ * @param perm 
+ * @return int 
+ */
 int mappages(pagetable_t pagetable_ptr,uint64_t va, uint64_t pa, uint64_t size, int perm){
     if(size == 0){
         panic("mappages: size couldn't be zero");
@@ -100,7 +115,15 @@ int mappages(pagetable_t pagetable_ptr,uint64_t va, uint64_t pa, uint64_t size, 
     }
     return 0;
 }
-
+/**
+ * @brief 在内核页表上添加一个映射 不会刷新TLB
+ * 
+ * @param kernel_pagetable_ptr 内核页表
+ * @param va 虚拟地址
+ * @param pa 物理地址
+ * @param size 
+ * @param perm 权限位
+ */
 void kvmmap(pagetable_t kernel_pagetable_ptr,uint64_t va, uint64_t pa, uint64_t size, uint32_t perm){
     if(mappages(kernel_pagetable_ptr,va,pa,size,perm)!= 0){
         panic("kvmmap: mappages failed");
@@ -257,7 +280,7 @@ int copyout(pagetable_t pagetable, uint64_t dstva, char* src,  uint64_t len){
     while(len > 0){
         uint64_t va = PGROUNDDOWN(dstva);
         uint64_t pa = walkaddr(pagetable,va);
-        if(pa == NULL) return -1;
+        if(pa == 0) return -1;
 
         uint64_t n = PGSIZE - (dstva - va);
         if(n > len)
@@ -268,4 +291,70 @@ int copyout(pagetable_t pagetable, uint64_t dstva, char* src,  uint64_t len){
         dstva = va + PGSIZE;
     }
     return 0;
+}
+/**
+ * @brief 将数据从用户复制到内核
+ * 
+ * @param pagetable 
+ * @param dst 
+ * @param srcva 
+ * @param len 
+ * @return int 
+ */
+int copyin(pagetable_t pagetable, char* dst, uint64_t srcva, uint64_t len){
+    while(len > 0){
+        uint64_t va = PGROUNDDOWN(srcva);
+        uint64_t pa = walkaddr(pagetable,va);
+        if(pa == 0)
+            return -1;
+        uint64_t n = PGSIZE - (srcva - va);
+        if (n > len)
+            n = len;
+        memmove(dst,(void*)(pa + (srcva - va)),n);
+        len -= n;
+        dst += n;
+        srcva = va + PGSIZE;
+    }
+    return 0;
+}
+/**
+ * @brief 将一个以'\0'结尾的字符串从进程内存复制到内核
+ * 
+ * @param pagetable 
+ * @param dst 
+ * @param srcva 
+ * @param max 字符串的最大长度
+ * @return int 0 成功 -1 失败
+ */
+int copyinstr(pagetable_t pagetable, char *dst, uint64_t srcva, uint64_t max){
+    int got_null = 0;
+    while(got_null == 0 && max > 0){
+        uint64_t va = PGROUNDDOWN(srcva);
+        uint64_t pa = walkaddr(pagetable,va);
+        if(pa==0)
+            return -1;
+        uint64_t n = PGSIZE - (srcva - va);
+        if(n > max)
+            n = max;
+        char *p = (char*)(pa + (srcva - va));
+        while(n > 0){
+            if(*p == '\0'){
+                *dst = '\0';
+                got_null = 1;
+                break;
+            } else {
+                *dst = *p;
+            }
+            n -= 1;
+            max -= 1;
+            p += 1;
+            dst += 1;
+        }
+        srcva = va + PGSIZE;
+    }
+    if(got_null){
+        return 0;
+    } else {
+        return -1;
+    }
 }
