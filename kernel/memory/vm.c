@@ -55,7 +55,10 @@ void unmunmap(pagetable_t pagetable,uint64_t va,uint64_t npages, int do_free){
         if((*pte & PTE_VALID) == 0){
             panic("unmunmap: not mapped. \n");
         }
-        // TODO: 验证此pte是否为页表的叶子节点
+        // 如果不是叶子节点的话 这里就只有一个有效位 没有权限位
+        if(PTE_FLAG(*pagetable) == PTE_VALID) {
+            panic("unmunmap: note a leaf. \n");
+        }
         if(do_free){
             uint64_t pa = VA2PA(PTE_ADDR(*pte));
             kfree((void*)pa);
@@ -211,8 +214,8 @@ void uvmfree(pagetable_t pagetable, uint64_t level){
     if(pagetable == NULL || level < 0){
         return;
     }
-    // TODO: ???
-    if(PTE_FLAG(pagetable)){
+    //由于PTE_FLAG是取低12位的值 如果其不等于零 也就意味着没有此地址没有4k对齐
+    if(PTE_FLAG(pagetable)!=0){
         panic("uvmfree: invalid pte. \n");
     }
     if(level == 0){
