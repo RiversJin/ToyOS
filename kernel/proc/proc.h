@@ -4,7 +4,7 @@
 #include "include/param.h"
 #include "../file/file.h"
 #include "arch/aarch64/arm.h"
-#include "arch/aarch64/include/cpu.h"
+#include "arch/aarch64/include/context.h"
 #include "memory/memory.h"
 #include "sync/spinlock.h"
 
@@ -41,6 +41,13 @@ struct proc{
     char name[16]; // 进程名 调试用
 };
 
+struct cpu{
+    struct context context;
+    struct proc* proc;
+    bool is_interupt_enabled;
+    int depth_spin_lock;
+    int cpuid; // 调试用
+};
 
 /**
  * @brief 返回CPUID 注意要在关中断的情况下使用,
@@ -51,14 +58,14 @@ static inline uint64_t cpuid(){
     return r_mpidr() & 0xFF;
 }
 
-/**
- * @brief 返回当前cpu的信息
- * 
- * @return struct cpu* 
- */
+
+/* 函数声明 */
+
 struct cpu* mycpu(void);
+struct proc* myproc(void);
 
 void init_awake_ap_by_spintable();
-
 void init_cpu_info();
+
+void init_proc();
 #endif //PROC_H

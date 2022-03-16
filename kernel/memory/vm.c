@@ -192,6 +192,12 @@ uint64_t uvmalloc(pagetable_t pagetable,uint64_t oldsz, uint64_t newsz){
     }
     return newsz;
 }
+uint64_t uvmdealloc(pagetable_t pagetable, uint64_t oldsz, uint64_t newsz){
+    if(newsz >= oldsz) return oldsz;
+    int npages = (oldsz - newsz) / PGSIZE;
+    unmunmap(pagetable,newsz,npages, 1);
+}
+
 /**
  * @brief 给定一个父进程的页表,将此进程的内存拷贝到子进程的页表中
  * 内容和页表项都会复制
@@ -248,7 +254,7 @@ void uvmfree(pagetable_t pagetable, uint64_t level){
     for(uint64_t i = 0;i < ENTRYSZ; ++i){
         if(pagetable[i] & PTE_VALID){
             uint64_t *v = (uint64_t*)PA2VA(PTE_ADDR(pagetable[i]));
-            vm_free(v,level-1);
+            uvmfree(v,level-1);
         }
         kfree(pagetable);
     }

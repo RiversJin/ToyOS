@@ -3,8 +3,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "arch/aarch64/include/cpu.h"
-#include "proc/proc.h"
 struct spinlock {
     bool locked;
 

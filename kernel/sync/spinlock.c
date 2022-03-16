@@ -2,7 +2,6 @@
 #include "interupt/interupt.h"
 #include "proc/proc.h"
 #include "console.h"
-#include "arch/aarch64/include/cpu.h"
 
 void init_spin_lock(struct spinlock *lock,const char *name){
     lock->locked = false;
