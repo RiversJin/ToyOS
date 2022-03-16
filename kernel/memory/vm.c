@@ -152,7 +152,7 @@ pagetable_t uvmcreate(void){
  * @param src 
  * @param sz 
  */
-void uvminit(pagetable_t pagetable, uint8_t *src, uint8_t sz){
+void uvminit(pagetable_t pagetable, uint8_t *src, int64_t sz){
     if(sz >= PGSIZE){
         panic("uvmminit: more than a page.");
     }

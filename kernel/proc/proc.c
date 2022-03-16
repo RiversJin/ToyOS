@@ -167,7 +167,20 @@ void forkret(){
     user_trapret(p->tf);
 }
 void init_user(){
-    extern char *user_init_begin;
-    extern char *user_init_end;
-    int64_t size = user_init_end - user_init_begin;
+    extern char user_init_begin[];
+    extern char user_init_end[];
+    int64_t code_size = (uint64_t)user_init_end - (uint64_t)user_init_begin;
+    struct proc *p = allocproc();
+    if(p == NULL){
+        panic("init_user: Failed to allocate proc. \n");
+    }
+    initproc = p;
+
+    p->sz = PGSIZE;
+    // 将初始用户程序代码复制到初始进程的空间中
+    uvminit(p->pagetable,(uint8_t*)user_init_begin,code_size);
+    memset(p->tf,0,sizeof(*p->tf));
+    p->tf->sp = PGSIZE; // 设置用户栈位置
+    p->tf->regs[30] = 0; //initcode位于进程地址空间的0处
+    
 }
