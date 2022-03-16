@@ -364,3 +364,11 @@ int copyinstr(pagetable_t pagetable, char *dst, uint64_t srcva, uint64_t max){
         return -1;
     }
 }
+pagetable_t alloc_pagetable(void){
+    pagetable_t pgt;
+    if((pgt = kalloc(PGSIZE)) == NULL){
+        return NULL;
+    }
+    memset(pgt, 0, PGSIZE);
+    return pgt;
+}

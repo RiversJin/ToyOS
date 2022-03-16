@@ -7,9 +7,10 @@
 #include "arch/aarch64/include/context.h"
 #include "memory/memory.h"
 #include "sync/spinlock.h"
+#include "arch/aarch64/include/trapframe.h"
 
 enum process_state {
-    UNSED,
+    UNUSED,
     EMBRYO,
     SLEEPING,
     RUNNABLE,

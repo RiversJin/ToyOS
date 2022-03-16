@@ -5,7 +5,7 @@
 #include "arch/aarch64/arm.h"
 
 
-
+pagetable_t alloc_pagetable(void);
 uint64_t walkaddr(pagetable_t pagetable_ptr,uint64_t va);
 void kvmmap(pagetable_t kernel_pagetable_ptr,uint64_t va, uint64_t pa, uint64_t size, uint32_t perm);
 int mappages(pagetable_t pagetable_ptr,uint64_t va, uint64_t pa, uint64_t size, int perm);
