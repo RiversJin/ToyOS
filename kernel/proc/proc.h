@@ -31,7 +31,7 @@ struct proc{
     struct proc* parent; 
     // these are private to the process, so p->lock need not be held.
 
-    uint64_t kstack; // 内核栈的底部
+    uint8_t *kstack; // 内核栈的底部
     uint64_t sz; // 进程使用的内存大小 以字节计
 
     pagetable_t pagetable; // 进程的页表

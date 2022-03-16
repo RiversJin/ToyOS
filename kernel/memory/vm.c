@@ -162,7 +162,7 @@ void uvminit(pagetable_t pagetable, uint8_t *src, uint8_t sz){
     }
     memset(mem,0,PGSIZE);
     memmove(mem,src,sz);
-    mappages(pagetable,0,src,sz,PTE_USER|PTE_RW|PTE_PAGE);
+    mappages(pagetable,0,(uint64_t)src,sz,PTE_USER|PTE_RW|PTE_PAGE);
 }
 
 /**
@@ -178,13 +178,13 @@ uint64_t uvmalloc(pagetable_t pagetable,uint64_t oldsz, uint64_t newsz){
         return oldsz;
     }
     oldsz = PGROUNDUP(oldsz);
-    for(uint64_t *a = oldsz; a < newsz; a+=PGSIZE){
+    for(uint64_t a = oldsz; a < newsz; a+=PGSIZE){
         uint8_t *mem = kalloc(PGSIZE);
         if(mem == NULL){
             uvmdealloc(pagetable,a,oldsz);
         }
         memset(mem,0,PGSIZE);
-        if(mappages(pagetable,a,mem,PGSIZE,PTE_USER|PTE_RW|PTE_PAGE)){
+        if(mappages(pagetable,a,(uint64_t)mem,PGSIZE,PTE_USER|PTE_RW|PTE_PAGE)){
             kfree(mem);
             uvmdealloc(pagetable,a,oldsz);
             return 0;
@@ -196,6 +196,7 @@ uint64_t uvmdealloc(pagetable_t pagetable, uint64_t oldsz, uint64_t newsz){
     if(newsz >= oldsz) return oldsz;
     int npages = (oldsz - newsz) / PGSIZE;
     unmunmap(pagetable,newsz,npages, 1);
+    return newsz;
 }
 
 /**
@@ -225,7 +226,7 @@ int uvmcopy(pagetable_t old, pagetable_t new, uint64_t sz){
             return -1;
         }
         memmove(mem, (void*)pa, PGSIZE);
-        if(mappages(new, i, mem, PGSIZE, flags) != 0){
+        if(mappages(new, i, (uint64_t)mem, PGSIZE, flags) != 0){
             kfree(mem);
             unmunmap(new, 0, i/PGSIZE, 1);
             return -1;
@@ -266,7 +267,7 @@ void uvmfree(pagetable_t pagetable, uint64_t level){
  * @param va 
  */
 void unmclear(uint64_t *pgdir, uint8_t *va){
-    uint64_t *pte = walk(pgdir, va, 0, NULL);
+    uint64_t *pte = walk(pgdir, (uint64_t)va, 0, NULL);
     if(pte == NULL){
         panic("uvmclear: failed to get the PTE. \n");
     }
@@ -291,7 +292,7 @@ int copyout(pagetable_t pagetable, uint64_t dstva, char* src,  uint64_t len){
         uint64_t n = PGSIZE - (dstva - va);
         if(n > len)
             n = len;
-        memmove((pa + (dstva - va)),src,n);
+        memmove((void*)(pa + (dstva - va)),src,n);
         len -= n;
         src += n;
         dstva = va + PGSIZE;

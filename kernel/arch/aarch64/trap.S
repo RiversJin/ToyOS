@@ -138,3 +138,8 @@ el0_aarch32:
     verror BAD_AARCH32
     verror BAD_AARCH32
 END(vectors)
+
+ENTRY(user_trapret)
+mov sp, x0
+kernel_exit 0, ret = 1
+END(user_trapret)

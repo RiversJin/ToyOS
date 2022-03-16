@@ -2,6 +2,8 @@
 #include "include/param.h"
 #include "../memory/kalloc.h"
 #include "../memory/vm.h"
+#include "../lib/string.h"
+#include "../console.h"
 
 struct cpu cpus[NCPU];
 struct process_table{
@@ -11,6 +13,7 @@ struct process_table{
 static volatile uint64_t* _spintable = (uint64_t*)PA2VA(0xD8);
 extern void _entry();
 extern void user_trapret(struct trapframe*);
+
 static struct proc *initproc;
 int nextpid = 1;
 
@@ -115,7 +118,7 @@ static struct proc * allocproc(void){
         return NULL;
     }
     // 在栈上为trapframe和context预留空间
-    char *sp = p->kstack + KSTACKSIZE;
+    uint8_t *sp = p->kstack + KSTACKSIZE;
     sp -= sizeof(*p->tf);
     p->tf = (struct trapframe *)sp;
 
@@ -162,4 +165,9 @@ void forkret(){
         // TODO: 记得在这里初始化文件系统 因为文件系统依赖进程的存在 所以不能直接在main中初始化
     }
     user_trapret(p->tf);
+}
+void init_user(){
+    extern char *user_init_begin;
+    extern char *user_init_end;
+    int64_t size = user_init_end - user_init_begin;
 }
