@@ -5,7 +5,7 @@
 #include "../file/file.h"
 #include "arch/aarch64/arm.h"
 #include "arch/aarch64/include/context.h"
-#include "memory/memory.h"
+#include "memory/vm.h"
 #include "sync/spinlock.h"
 #include "arch/aarch64/include/trapframe.h"
 

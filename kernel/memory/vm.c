@@ -1,8 +1,10 @@
 #include "vm.h"
 #include "arch/aarch64/mmu.h"
+#include "arch/aarch64/arm.h"
 #include "console.h"
 #include "kalloc.h"
 #include "lib/string.h"
+#include "../proc/proc.h"
 
 static inline bool _check_MSB_valid(uint64_t va){
     uint64_t most_significant_bits = va >> (64 - 16) & 0xFFFF;
@@ -162,7 +164,7 @@ void uvminit(pagetable_t pagetable, uint8_t *src, int64_t sz){
     }
     memset(mem,0,PGSIZE);
     memmove(mem,src,sz);
-    mappages(pagetable,0,(uint64_t)src,sz,PTE_USER|PTE_RW|PTE_PAGE);
+    mappages(pagetable,0,(uint64_t)mem,sz,PTE_USER|PTE_RW|PTE_PAGE);
 }
 
 /**
@@ -372,4 +374,21 @@ pagetable_t alloc_pagetable(void){
     }
     memset(pgt, 0, PGSIZE);
     return pgt;
+}
+/**
+ * @brief 将此核心MMU的用户页表切换为指定进程的页表
+ * 
+ * @param p 
+ */
+void uvmswitch(struct proc *p){
+    if (p == NULL){
+        panic("uvmswitch: process invalid.\n");
+    }
+    if (p->kstack == NULL){
+        panic("uvmswitch: process' kstack invalid.\n");
+    }
+    if (p->pagetable == NULL){
+        panic("uvmswitch: process' pagetable invalid.\n");
+    }
+    lttbr0(VA2PA(p->pagetable));
 }

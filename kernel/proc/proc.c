@@ -224,6 +224,7 @@ void scheduler(void){
             if(p->state == RUNNABLE){
                 p->state = RUNNING;
                 c->proc = p;
+                uvmswitch(p);
                 swtch(&c->context, &p->context);
                 c->proc = NULL;
             }

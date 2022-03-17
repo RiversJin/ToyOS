@@ -182,6 +182,22 @@ static inline void delayus(uint32_t n){
     } while (r < t);
 }
 
+/* Load Translation Table Base Register 0 (EL1). */
+static inline void lttbr0(uint64_t p) {
+    asm volatile("msr ttbr0_el1, %[x]" : : [x] "r"(p));
+    disb();
+    asm volatile("tlbi vmalle1");
+    disb();
+}
+
+/* Load Translation Table Base Register 1 (EL1). */
+static inline void lttbr1(uint64_t p){
+    asm volatile("msr ttbr1_el1, %[x]" : : [x] "r"(p));
+    disb();
+    asm volatile("tlbi vmalle1");
+    disb();
+}
+
 
 typedef uint64_t pte_t;
 typedef uint64_t * pagetable_t;

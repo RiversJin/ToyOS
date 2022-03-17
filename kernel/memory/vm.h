@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "arch/aarch64/arm.h"
-
+struct proc;
 
 pagetable_t alloc_pagetable(void);
 uint64_t walkaddr(pagetable_t pagetable_ptr,uint64_t va);
@@ -20,4 +20,5 @@ void unmclear(uint64_t *pgdir, uint8_t *va);
 int copyout(pagetable_t pagetable, uint64_t dstva, char* src,  uint64_t len);
 int copyin(pagetable_t pagetable, char *dst, uint64_t srcva, uint64_t len);
 int copyinstr(pagetable_t pagetable, char *dst, uint64_t srcva, uint64_t max);
+void uvmswitch(struct proc *p);
 #endif // VM_H
