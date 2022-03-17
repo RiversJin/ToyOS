@@ -242,7 +242,7 @@ proc_dump()
     };
 
     cprintf("\n====== PROCESS DUMP ======\n");
-    for (struct proc* p = ptable.proc; p < &ptable.proc[NPROC]; ++p) {
+    for (struct proc* p = process_table.proc; p < &process_table.proc[NPROC]; ++p) {
         if (p->state == UNUSED) continue;
         char* state =
             (p->state >= 0 && p->state < ARRAY_SIZE(states) && states[p->state])
