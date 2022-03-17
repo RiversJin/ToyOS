@@ -36,7 +36,7 @@ struct proc{
 
     pagetable_t pagetable; // 进程的页表
     struct trapframe* tf;  // 进程发起系统调用时使用
-    struct context* context; // 进程切换时使用
+    struct context context; // 进程切换时使用
     struct file* ofile[NOFILE]; // 进程打开的文件
     struct inode* cwd; // 当前工作目录
     char name[16]; // 进程名 调试用
@@ -69,4 +69,7 @@ void init_awake_ap_by_spintable();
 void init_cpu_info();
 
 void init_proc();
+
+void scheduler(void);
+void init_user();
 #endif //PROC_H

@@ -14,7 +14,7 @@ struct process_table{
 static volatile uint64_t* _spintable = (uint64_t*)PA2VA(0xD8);
 extern void _entry();
 extern void user_trapret(struct trapframe*);
-extern void swtch(struct context **old, struct context *new);
+extern void swtch(struct context *old, struct context *new);
 
 static struct proc *initproc;
 int nextpid = 1;
@@ -67,6 +67,7 @@ struct proc* myproc(void){
  * 
  */
 void init_proc(){
+    init_cpu_info();
     init_spin_lock(&wait_lock,"wait_lock");
     init_spin_lock(&pid_lock,"pid_lock");
     for(struct proc *p = process_table.proc; p < &process_table.proc[NPROC]; ++p){
@@ -124,11 +125,9 @@ static struct proc * allocproc(void){
     sp -= sizeof(*p->tf);
     p->tf = (struct trapframe *)sp;
 
-    sp -= sizeof(*p->context);
-    p->context = (struct context *)sp;
-    memset(p->context,0,sizeof(struct context));
+    memset(&p->context,0,sizeof(struct context));
     // 构造返回地址
-    p->context->x30 = (uint64_t)forkret;
+    p->context.x30 = (uint64_t)forkret;
 
     cprintf("alloc_proc: process %d allocated. \n");
     return p;

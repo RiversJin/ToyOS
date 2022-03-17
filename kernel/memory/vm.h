@@ -10,7 +10,7 @@ uint64_t walkaddr(pagetable_t pagetable_ptr,uint64_t va);
 void kvmmap(pagetable_t kernel_pagetable_ptr,uint64_t va, uint64_t pa, uint64_t size, uint32_t perm);
 int mappages(pagetable_t pagetable_ptr,uint64_t va, uint64_t pa, uint64_t size, int perm);
 pagetable_t uvmcreate(void);
-void uvminit(pagetable_t pagetable, uint8_t *src, uint8_t sz);
+void uvminit(pagetable_t pagetable, uint8_t *src, int64_t sz);
 uint64_t uvmalloc(pagetable_t pagetable,uint64_t oldsz, uint64_t newsz);
 uint64_t uvmdealloc(pagetable_t, uint64_t, uint64_t);
 int uvmcopy(pagetable_t, pagetable_t, uint64_t);

@@ -14,19 +14,20 @@ void main(){
     if(cpuid() == 0){
         console_init();
         alloc_init();
+        init_proc();
         exception_handler_init();
         timer_init();
         enable_interrupt();
 
         sd_init();
-        init_awake_ap_by_spintable();
-        
+        //init_awake_ap_by_spintable();
+        init_user();
     }
     
     // timer_init();
     // enable_interrupt();
     cprintf("main: [CPU %d] started.\n", cpuid());
-    
+    scheduler();
     while(1){
         
 
