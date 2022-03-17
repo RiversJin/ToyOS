@@ -4,6 +4,7 @@
 #include "../memory/vm.h"
 #include "../lib/string.h"
 #include "../console.h"
+#include "../interupt/interupt.h"
 
 struct cpu cpus[NCPU];
 struct process_table{
@@ -13,6 +14,7 @@ struct process_table{
 static volatile uint64_t* _spintable = (uint64_t*)PA2VA(0xD8);
 extern void _entry();
 extern void user_trapret(struct trapframe*);
+extern void swtch(struct context **old, struct context *new);
 
 static struct proc *initproc;
 int nextpid = 1;
@@ -183,4 +185,111 @@ void init_user(){
     p->tf->sp = PGSIZE; // 设置用户栈位置
     p->tf->regs[30] = 0; //initcode位于进程地址空间的0处
     
+    safestrcpy(p->name,"initcode",sizeof(p->name));
+    // TODO: 记得这里要设定当前工作目录
+    // p->cwd = ...
+    p->state = RUNNABLE;
+    release_spin_lock(&p->lock);
+
+}
+
+void sched(){
+    int intena;
+    struct proc *p = myproc();
+    if(!is_current_cpu_holding_spin_lock(&p->lock)){
+        panic("sched: p->lock not locked.\n");
+    }
+    if(mycpu()->depth_spin_lock != 1){
+        panic("sched: sched locks.\n");
+    }
+    if(p->state == RUNNING){
+        panic("sched: process is running.\n");
+    }
+    if(is_interupt_enabled()){
+        panic("sched: interrupt is enabled.\n");
+    }
+    intena = mycpu()->depth_spin_lock;
+    swtch(&p->context, &mycpu()->context);
+    mycpu()->depth_spin_lock = intena;
+}
+
+void scheduler(void){
+    
+    struct cpu *c = mycpu();
+    c -> proc = NULL;
+    
+    while(1){
+        enable_interrupt(); // 设备可能会中断
+        for(struct proc *p = process_table.proc; p < &process_table.proc[NPROC]; ++p){
+            acquire_spin_lock(&p->lock);
+            if(p->state == RUNNABLE){
+                p->state = RUNNING;
+                c->proc = p;
+                swtch(&c->context, &p->context);
+                c->proc = NULL;
+            }
+            release_spin_lock(&p->lock);
+        }
+    }
+}
+
+void
+proc_dump()
+{
+    static char* states[] = {
+        [UNUSED] "UNUSED  ",  [SLEEPING] "SLEEPING", [RUNNABLE] "RUNNABLE",
+        [RUNNING] "RUNNING ", [ZOMBIE] "ZOMBIE  ",
+    };
+
+    cprintf("\n====== PROCESS DUMP ======\n");
+    for (struct proc* p = ptable.proc; p < &ptable.proc[NPROC]; ++p) {
+        if (p->state == UNUSED) continue;
+        char* state =
+            (p->state >= 0 && p->state < ARRAY_SIZE(states) && states[p->state])
+                ? states[p->state]
+                : "UNKNOWN ";
+        cprintf("[%s] %d (%s)\n", state, p->pid, p->name);
+    }
+    cprintf("====== DUMP END ======\n\n");
+}
+
+void
+trapframe_dump(struct proc* p)
+{
+    cprintf("\n====== TRAP FRAME DUMP ======\n");
+    cprintf("sp:\t%lld\n", p->tf->sp_el0);
+    cprintf("spsr:\t%lld\n", p->tf->spsr_el1);
+    cprintf("elr:\t%lld\n", p->tf->elr_el1);
+    cprintf("x0:\t%lld\n", p->tf->x0);
+    cprintf("x1:\t%lld\n", p->tf->x1);
+    cprintf("x2:\t%lld\n", p->tf->x2);
+    cprintf("x3:\t%lld\n", p->tf->x3);
+    cprintf("x4:\t%lld\n", p->tf->x4);
+    cprintf("x5:\t%lld\n", p->tf->x5);
+    cprintf("x6:\t%lld\n", p->tf->x6);
+    cprintf("x7:\t%lld\n", p->tf->x7);
+    cprintf("x8:\t%lld\n", p->tf->x8);
+    cprintf("x9:\t%lld\n", p->tf->x9);
+    cprintf("x10:\t%lld\n", p->tf->x10);
+    cprintf("x11:\t%lld\n", p->tf->x11);
+    cprintf("x12:\t%lld\n", p->tf->x12);
+    cprintf("x13:\t%lld\n", p->tf->x13);
+    cprintf("x14:\t%lld\n", p->tf->x14);
+    cprintf("x15:\t%lld\n", p->tf->x15);
+    cprintf("x16:\t%lld\n", p->tf->x16);
+    cprintf("x17:\t%lld\n", p->tf->x17);
+    cprintf("x18:\t%lld\n", p->tf->x18);
+    cprintf("x19:\t%lld\n", p->tf->x19);
+    cprintf("x20:\t%lld\n", p->tf->x20);
+    cprintf("x21:\t%lld\n", p->tf->x21);
+    cprintf("x22:\t%lld\n", p->tf->x22);
+    cprintf("x23:\t%lld\n", p->tf->x23);
+    cprintf("x24:\t%lld\n", p->tf->x24);
+    cprintf("x25:\t%lld\n", p->tf->x25);
+    cprintf("x26:\t%lld\n", p->tf->x26);
+    cprintf("x27:\t%lld\n", p->tf->x27);
+    cprintf("x28:\t%lld\n", p->tf->x28);
+    cprintf("x29:\t%lld\n", p->tf->x29);
+    cprintf("x30:\t%lld\n", p->tf->x30);
+    cprintf("====== DUMP END ======\n\n");
 }
