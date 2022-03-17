@@ -253,43 +253,13 @@ proc_dump()
     cprintf("====== DUMP END ======\n\n");
 }
 
-void
-trapframe_dump(struct proc* p)
-{
+void trapframe_dump(struct proc* p){
     cprintf("\n====== TRAP FRAME DUMP ======\n");
-    cprintf("sp:\t%lld\n", p->tf->sp_el0);
-    cprintf("spsr:\t%lld\n", p->tf->spsr_el1);
-    cprintf("elr:\t%lld\n", p->tf->elr_el1);
-    cprintf("x0:\t%lld\n", p->tf->x0);
-    cprintf("x1:\t%lld\n", p->tf->x1);
-    cprintf("x2:\t%lld\n", p->tf->x2);
-    cprintf("x3:\t%lld\n", p->tf->x3);
-    cprintf("x4:\t%lld\n", p->tf->x4);
-    cprintf("x5:\t%lld\n", p->tf->x5);
-    cprintf("x6:\t%lld\n", p->tf->x6);
-    cprintf("x7:\t%lld\n", p->tf->x7);
-    cprintf("x8:\t%lld\n", p->tf->x8);
-    cprintf("x9:\t%lld\n", p->tf->x9);
-    cprintf("x10:\t%lld\n", p->tf->x10);
-    cprintf("x11:\t%lld\n", p->tf->x11);
-    cprintf("x12:\t%lld\n", p->tf->x12);
-    cprintf("x13:\t%lld\n", p->tf->x13);
-    cprintf("x14:\t%lld\n", p->tf->x14);
-    cprintf("x15:\t%lld\n", p->tf->x15);
-    cprintf("x16:\t%lld\n", p->tf->x16);
-    cprintf("x17:\t%lld\n", p->tf->x17);
-    cprintf("x18:\t%lld\n", p->tf->x18);
-    cprintf("x19:\t%lld\n", p->tf->x19);
-    cprintf("x20:\t%lld\n", p->tf->x20);
-    cprintf("x21:\t%lld\n", p->tf->x21);
-    cprintf("x22:\t%lld\n", p->tf->x22);
-    cprintf("x23:\t%lld\n", p->tf->x23);
-    cprintf("x24:\t%lld\n", p->tf->x24);
-    cprintf("x25:\t%lld\n", p->tf->x25);
-    cprintf("x26:\t%lld\n", p->tf->x26);
-    cprintf("x27:\t%lld\n", p->tf->x27);
-    cprintf("x28:\t%lld\n", p->tf->x28);
-    cprintf("x29:\t%lld\n", p->tf->x29);
-    cprintf("x30:\t%lld\n", p->tf->x30);
+    cprintf("sp: %d\n", p->tf->sp);
+    cprintf("pc: %d\n", p->tf->pc);
+    cprintf("pstate: %d\n", p->tf->pstate);
+    for(uint64_t i = 0; i<31; ++i){
+        cprintf("x%d: %d\n",p->tf->regs[i]);
+    }
     cprintf("====== DUMP END ======\n\n");
 }
