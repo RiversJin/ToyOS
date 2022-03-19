@@ -11,6 +11,10 @@
 #define NBUF (MAXOPBLOCKS * 3) // buffer缓存大小
 #define LOGSIZE (MAXOPBLOCKS * 3)
 
+#define NINODE 50 //最大的的处于活动状态的 inode 数目
+
+#define ROOTDEV 1  // device number of file system root disk
+
 // mkfs only
 #define FSSIZE 1000  // Size of file system in blocks
 
