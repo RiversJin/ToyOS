@@ -72,4 +72,6 @@ void init_proc();
 
 void scheduler(void);
 void init_user();
+
+void exit(int);
 #endif //PROC_H

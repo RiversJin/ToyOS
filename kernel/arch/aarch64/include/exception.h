@@ -14,4 +14,12 @@
 
 #define BAD_AARCH32     8
 
+
+/* 在ESR_EL1(Exception Syndrome Register)中, Exception Class的定义 */
+#define EC_Unknown  0x0
+#define EC_WF_INSTRUCTION   0x0
+#define EC_ILLEGAL_EXECUTION_STATE  0xE
+#define EC_SVC64    0x15
+
+#define ISS_MASK    0xFFFFFF
 #endif

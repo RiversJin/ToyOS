@@ -9,6 +9,7 @@
 #include "proc/proc.h"
 
 #include "board/raspi3/uart.h"
+extern int64_t syscall(struct trapframe *frame);
 
 void trap_error(uint64_t error_type){
     switch(error_type){
@@ -26,14 +27,29 @@ void trap_error(uint64_t error_type){
 }
 
 void el_sync_trap(struct trapframe * frame_ptr,uint64_t esr){
-    uint64_t exception_class_id = esr >> 26;
+    uint64_t exception_class_id = (esr >> 26)&0b111111;
     uint64_t instruction_length = (esr & (1<<25)) != 0;
-    panic("el_sync_trap: exception class id: %x, instruction length: %d",exception_class_id, instruction_length);
+    panic("el_sync_trap: exception class id: 0x%x, instruction length: %d",exception_class_id, instruction_length);
 }
 void el0_sync_trap(struct trapframe * frame,uint64_t esr){
-    uint64_t exception_class_id = esr >> 26;
-    uint64_t instruction_length = (esr & (1<<25)) != 0;
-    panic("el0_sync_trap: exception class id: %x, instruction length: %d",exception_class_id, instruction_length);
+    uint64_t exception_class_id = (esr >> 26)&0b111111;
+    uint64_t iss = (esr & ISS_MASK);
+    if(exception_class_id == EC_SVC64 && iss == 0){
+        struct proc *p = myproc();
+        if(p->killed){
+            exit(-1);
+        }
+        p->tf = frame;
+        //enable_interrupt();
+        p->tf->regs[0] = syscall(frame);
+        
+        if(p->killed){
+            exit(-1);
+        }
+    }else{
+        panic("el0_sync_trap: exception class id: 0x%x, iss: %d",exception_class_id, iss);
+    }
+
 }
 
 

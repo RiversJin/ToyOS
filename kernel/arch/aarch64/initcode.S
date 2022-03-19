@@ -6,7 +6,7 @@
 .p2align 4
 # exit(0);
 user_init_begin:
-mov     x0, 0
+mov     x0, -1
 mov     x8, #SYS_exit
 svc     0x0
 b user_init_begin

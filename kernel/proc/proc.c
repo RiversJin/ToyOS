@@ -127,11 +127,12 @@ static struct proc * allocproc(void){
 
     memset(&p->context,0,sizeof(struct context));
     // 构造返回地址
+    cprintf("allocproc: kernel sp: 0x%x \n",sp);
     p->context.x29 = (uint64_t)sp;
     p->context.sp_el1 = (uint64_t)sp;
     p->context.x30 = (uint64_t)forkret;
 
-    cprintf("alloc_proc: process %d allocated. \n");
+    cprintf("alloc_proc: process %d allocated. \n",p->pid);
     return p;
 }
 /**
@@ -264,4 +265,16 @@ void trapframe_dump(struct proc* p){
         cprintf("x%d: %d\n",p->tf->regs[i]);
     }
     cprintf("====== DUMP END ======\n\n");
+}
+/**
+ * @brief 退出当前进程
+ * 
+ * @param status 
+ */
+void exit(int status){
+    struct proc* p = myproc();
+    if(p == initproc){
+        panic("init proc exit with status code %d\n",status);
+    }
+    panic("exit: status = %d.\n",status);
 }

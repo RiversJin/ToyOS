@@ -93,7 +93,8 @@ el0_sync:
     kernel_entry 0
     mrs x1, esr_el1
     mov x0, sp
-    b el0_sync_trap
+    bl el0_sync_trap
+    b user_trapret
 
 .align 6
 el_irq:
