@@ -39,6 +39,8 @@ struct dinode{
 #define IPB (BSIZE / sizeof(struct dinode))
 // 给定一个inode号 获得对应的磁盘上的偏移量
 #define IBLOCK(i,sb) (((i)/IPB)+sb.inodestart)
+
+/* Bitmap bits per block. */
 #define BPB (BSIZE * 8)
 #define BBLOCK(b,sb) (((b)/IPB)+sb.bmapstart)
 

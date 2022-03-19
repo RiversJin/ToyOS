@@ -29,7 +29,7 @@ void binit();
  * @param blockno 
  * @return struct buf* 
  */
-struct buf* read(uint32_t dev, uint32_t blockno);
+struct buf* bread(uint32_t dev, uint32_t blockno);
 /**
  * @brief 将对应的buf写入到设备 此时这个buf必须已上锁
  * 
