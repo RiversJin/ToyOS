@@ -18,6 +18,8 @@ struct context {
     uint64_t x28;
     uint64_t x29; // Stack Frame Pointer
     uint64_t x30; // Link register (the address to return)
+    uint64_t tpidr_el0; // "Thread ID" Register
+    uint64_t sp_el1;
 };
 #define CONTEXT_SIZE sizeof(struct context)
 #else

@@ -140,13 +140,12 @@ el0_aarch32:
 END(vectors)
 
 ENTRY(user_trapret)
-mov sp, x0
-#kernel_exit 0, ret = 1
-ldp     x21,x22, [sp, #16*16]
+    #kernel_exit 0, ret = 1
+    ldp     x21,x22, [sp, #16*16]
 
 #    .if     \el == 0
-        ldr     x23, [sp, #8*33]
-        msr     sp_el0, x23
+    ldr     x23, [sp, #8*33]
+    msr     sp_el0, x23
 #    .endif
     msr     elr_el1, x21
     msr     spsr_el1, x22

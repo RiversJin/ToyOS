@@ -13,7 +13,7 @@ struct process_table{
 
 static volatile uint64_t* _spintable = (uint64_t*)PA2VA(0xD8);
 extern void _entry();
-extern void user_trapret(struct trapframe*);
+extern void user_trapret();
 extern void swtch(struct context *old, struct context *new);
 
 static struct proc *initproc;
@@ -120,13 +120,15 @@ static struct proc * allocproc(void){
         release_spin_lock(&p->lock);
         return NULL;
     }
-    // 在栈上为trapframe和context预留空间
+    // 在栈上为trapframe预留空间
     uint8_t *sp = p->kstack + KSTACKSIZE;
     sp -= sizeof(*p->tf);
     p->tf = (struct trapframe *)sp;
 
     memset(&p->context,0,sizeof(struct context));
     // 构造返回地址
+    p->context.x29 = (uint64_t)sp;
+    p->context.sp_el1 = (uint64_t)sp;
     p->context.x30 = (uint64_t)forkret;
 
     cprintf("alloc_proc: process %d allocated. \n");
@@ -165,7 +167,7 @@ void forkret(){
         first = 0;
         // TODO: 记得在这里初始化文件系统 因为文件系统依赖进程的存在 所以不能直接在main中初始化
     }
-    user_trapret(p->tf);
+    user_trapret();
 }
 void init_user(){
     extern char user_init_begin[];
