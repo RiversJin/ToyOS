@@ -2,6 +2,8 @@
 #define FS_H
 #include "../include/stdint.h"
 #include "../include/param.h"
+#include "../sync/sleeplock.h"
+#include "../include/stat.h"
 
 #define ROOTINO 1 
 #define BSIZE 512 // 块大小
@@ -24,6 +26,24 @@ struct superblock {
     uint32_t logstart;
     uint32_t inodestart;
     uint32_t bmapstart;
+};
+/**
+ * @brief 内存中的inode定义
+ * 
+ */
+struct inode {
+    uint32_t dev; 
+    uint32_t inum; // inode number
+    int ref; // reference count
+    struct sleeplock lock; // 保护下面的内容
+    int valid; // 是否已经从磁盘中读取到内存
+    // 从磁盘中即 dinode读取的内容
+    uint16_t type;
+    uint16_t major;
+    uint16_t minor;
+    uint16_t nlink;
+    uint32_t size;
+    uint32_t addrs[NDIRECT + 1];
 };
 
 // 磁盘上inode的结构定义

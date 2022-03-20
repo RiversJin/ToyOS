@@ -3,7 +3,7 @@
 #include "arch/aarch64/include/trapframe.h"
 #include "proc/proc.h"
 #include "sysproc.h"
-
+#include "../console.h"
 
 static int64_t (*syscalls[])(void) = {
     [SYS_exit]  sys_exit
@@ -30,7 +30,7 @@ int64_t syscall(struct trapframe *frame){
  * @param ip 
  * @return int 
  */
-int fetchint64ataddr(uint64_t addr, uint64_t *ip){
+int64_t fetchint64ataddr(uint64_t addr, uint64_t *ip){
     struct proc *proc = myproc();
     if(addr >= proc->sz || addr + sizeof(*ip) > proc->sz){
         return -1;
@@ -46,14 +46,14 @@ int fetchint64ataddr(uint64_t addr, uint64_t *ip){
  * @param p 
  * @return int 
  */
-int fetchstr(uint64_t addr,char** p){
+int64_t fetchstr(uint64_t addr,char** p){
     struct proc *proc = myproc();
     if(addr >= proc->sz)return -1;
     char* ep = (char*) proc -> sz;
     for (char* s = (char*) addr; s < ep; ++s) {
         if (*s == '\0'){
-            *p = addr;
-            return s - addr;
+            *p = (char*) addr;
+            return ((int64_t)s - (int64_t)addr);
         }
     }
     return -1;
@@ -65,7 +65,7 @@ int fetchstr(uint64_t addr,char** p){
  * @param ip 
  * @return int 
  */
-int argint(int n, uint64_t* ip){
+int64_t argint(int n, uint64_t* ip){
     if(n < 0 || n > 5){
         cprintf("argint: invalid argument number %d\n", n);
         return -1;
@@ -83,7 +83,7 @@ int argint(int n, uint64_t* ip){
  * @param size 
  * @return int 
  */
-int argptr(int n,char** pp,int size){
+int64_t argptr(int n,char** pp,int size){
     uint64_t i;
     if(argint(n,&i)<0) return -1;
     struct proc* p = myproc();
@@ -98,7 +98,7 @@ int argptr(int n,char** pp,int size){
  * @param pp 
  * @return int 
  */
-int argstr(int n, char** pp){
+int64_t argstr(int n, char** pp){
     uint64_t addr;
     if(argint(n,&addr) < 0)return -1;
     return fetchstr(n,pp);

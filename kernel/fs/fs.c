@@ -109,7 +109,7 @@ static struct inode* iget(uint32_t dev, uint32_t inum);
 struct inode* ialloc(uint32_t dev, uint16_t type){
     for(int inum = 1; inum < sb->ninodes; ++inum){
         struct buf *bp = bread(dev, IBLOCK(inum,sb[0]));
-        struct dinode *dip = (struct dinode*)bp->data; + inum%IPB;
+        struct dinode *dip = (struct dinode*)bp->data + inum%IPB;
         if(dip->type == 0){
             memset(dip, 0, sizeof(*dip));
             dip->type = type;
@@ -120,6 +120,7 @@ struct inode* ialloc(uint32_t dev, uint16_t type){
         brelease(bp); 
     }
     panic("balloc: no available inodes.\n");
+    return NULL;
 }
 /**
  * @brief 将一个被修改后的在内存中的inode 复制到磁盘
@@ -199,7 +200,7 @@ void ilock(struct inode *ip){
   if(ip == 0 || ip->ref < 1)
     panic("ilock");
 
-  acquiresleep(&ip->lock);
+  acquire_sleep_lock(&ip->lock);
 
   if(ip->valid == 0){
     bp = bread(ip->dev, IBLOCK(ip->inum, sb[0]));
@@ -392,7 +393,7 @@ int writei(struct inode *ip, char* src, uint32_t offset, uint32_t n){
 }
 
 int namecmp(const char *s, const char *t){
-    return strcmp(s,t, DIRSIZ);
+    return strncmp(s,t, DIRSIZ);
 }
 /**
  * @brief 查找directory中名字为name的项目 如果找到后将poff设定为对应的偏移量
@@ -423,7 +424,7 @@ struct inode* dirlookup(struct inode* dp, char *name, uint32_t *poff){
 int dirlink(struct inode *dp, char *name, uint32_t inum){
     struct dirent de;
     struct inode *ip;
-    if(ip = dirlookup(dp, name, NULL) != 0){
+    if((ip = dirlookup(dp, name, NULL)) != NULL){
         iput(ip);
         return -1;
     }
@@ -469,9 +470,7 @@ static char* skipelem(char *path, char *name){
     return path;
 }
 
-struct inode* nameiparent(char *path, char *name) {
-  return namex(path, 1, name);
-}
+
 /**
  * @brief 查找并返回指定路径的inode 
  * 如果 nameiparent 非零, 返回父目录的inode
@@ -511,6 +510,9 @@ static struct inode* namex(char* path, int nameiparent, char* name){
     return ip;
 }
 
+struct inode* nameiparent(char *path, char *name) {
+  return namex(path, 1, name);
+}
 struct inode* namei(char *path){
   char name[DIRSIZ];
   return namex(path, 0, name);

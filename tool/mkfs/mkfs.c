@@ -12,11 +12,11 @@ typedef uint32_t uint;
 
 // this file should be compiled with normal gcc...
 
-#define stat  xv6_stat  // avoid clash with host struct stat
-#define sleep xv6_sleep
 #include "../../kernel/include/param.h"
 #include "../../kernel/fs/fs.h"
 #include "../../kernel/include/stat.h"
+#define stat  xv6_stat  // avoid clash with host struct stat
+#define sleep xv6_sleep
 
 #ifndef static_assert
 #    define static_assert(a, b)                                                \

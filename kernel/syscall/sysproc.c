@@ -4,7 +4,7 @@
 
 int64_t sys_exit(){
     int n;
-    if(argint(0, &n) < 0){ 
+    if(argint(0, (uint64_t*)&n) < 0){ 
         return -1;
     }
     exit(n);

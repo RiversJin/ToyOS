@@ -25,20 +25,6 @@ struct file {
 #define major(dev) ((dev)>>16 & 0xFFFF)
 #define minor(dev) ((dev) & 0xFFFF)
 #define mkdev(m,n) ((uint32_t)((m) << 16) | (n))
-struct inode {
-    uint32_t dev; 
-    uint32_t inum; // inode number
-    int ref; // reference count
-    struct sleeplock lock; // 保护下面的内容
-    int valid; // 是否已经从磁盘中读取到内存
-    // 从磁盘中即 dinode读取的内容
-    uint16_t type;
-    uint16_t major;
-    uint16_t minor;
-    uint16_t nlink;
-    uint32_t size;
-    uint32_t addrs[NDIRECT + 1];
-};
 
 // 通过主设备号映射对应的读写函数
 struct devsw{

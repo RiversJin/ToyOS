@@ -136,7 +136,7 @@ static void write_log(void){
         brelease(to);
     }
 }
-static void vommit(void){
+static void commit(void){
     if(log.lh.n > 0){
         write_log();
         write_head();
