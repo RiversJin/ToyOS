@@ -1,6 +1,6 @@
 #include "log.h"
 #include "../include/stdint.h"
-#include "../console.h"
+#include "../printf.h"
 #include "../lib/string.h"
 #include "../proc/proc.h"
 

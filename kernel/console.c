@@ -1,129 +1,118 @@
 #include <stdarg.h>
-#include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include "include/stdint.h"
 #include "arch/aarch64/board/raspi3/uart.h"
 #include "sync/spinlock.h"
+#include "proc/proc.h"
+#include "include/param.h"
+#include "file/file.h"
+
+#define BACKSPACE 0x100
+#define C(x) ((x) - '@')  // 控制字符
 
 extern void uart_putchar(int c);
+extern void uart_putchar_sync(int c);
 extern void uart_init();
 
-volatile int panicked = 0;
-static struct print_lock{
-    struct spinlock lock;
-    bool locking;
-} print_lock;
 
-/**
- * @brief 初始化中断 在这里就是初始化串口
- * 
- */
-void console_init(void){
-    uart_init();
-    init_spin_lock(&print_lock.lock,"print spin lock");
-    print_lock.locking = true;
-}
-/**
- * @brief 向串口打印数字
- * 
- * @param x 数字的值
- * @param base 进制
- * @param sign 是否有符号
- */
-static void printint(int64_t x,int base, int sign){
-    static char digit[] = "0123456789ABCEDF";
-    static char buf[64];
-    if (sign && x < 0) {
-        x = -x;
-        uart_putchar('-');
+void consputc(int c){
+    if(c == BACKSPACE){
+        uart_putchar_sync('\b');
+        uart_putchar_sync(' ');
+        uart_putchar_sync('\b');
+    }else{
+        uart_putchar_sync(c);
     }
-    int i = 0;
-    uint64_t t = x;
-    do {
-        buf[i++] = digit[t % base];
-    } while (t /= base);
-    while (i--) uart_putchar(buf[i]);
 }
 
-static void vprintfmt(void (*putch)(int), const char *fmt, va_list ap){
-    int i, c;
-    char *s;
-    for (i = 0; (c = fmt[i] & 0xff) != 0; i++) {
-        if (c != '%') {
-            putch(c);
-            continue;
+struct cons{
+    struct spinlock lock;
+    char buf[INPUT_BUF];
+    uint32_t r; // read index
+    uint32_t w; // write index
+    uint32_t e; // edit index
+} cons;
+
+int consolewrite(char* src, int n){
+    int i;
+    for(i = 0;i < n; ++i){
+        uart_putchar(*(src + i));
+    }
+    return i;
+}
+
+int consoleread(char* dst, int n){
+    int c;
+    uint32_t target =  n;
+    acquire_spin_lock(&cons.lock);
+    while(n > 0){
+        while(cons.r == cons.w){
+            if(myproc()->killed){
+                release_spin_lock(&cons.lock);
+                return -1;
+            }
+            sleep(&cons.r, &cons.lock);
         }
+        c = cons.buf[cons.r ++ % INPUT_BUF];
+        if(c == C('D')){
+            // end of file
+            if(n < target ){
+                cons.r -- ;
+            }
+            break;
+        }
+        *dst = c;
+        dst++;
+        --n;
+        if(c == '\n'){ 
+            break;
+        }
+    }
+    release_spin_lock(&cons.lock);
+    return target - n;
+}
 
-        int l = 0;
-        for (; fmt[i+1] == 'l'; i++)
-            l++;
-
-        if (!(c = fmt[++i] & 0xff))
+void consoleinter(int c){
+    acquire_spin_lock(&cons.lock);
+    switch(c){
+        case C('P'):
+            // procdump
             break;
 
-        switch (c) {
-        case 'u':
-            if (l == 2) printint(va_arg(ap, int64_t), 10, 0);
-            else printint(va_arg(ap, int), 10, 0);
+        case C('U'):
+            while(cons.e != cons.w && cons.buf[(cons.e - 1) % INPUT_BUF] != '\n'){
+                cons.e --;
+                consputc(BACKSPACE);
+            }
             break;
-        case 'd':
-            if (l == 2) printint(va_arg(ap, int64_t), 10, 1);
-            else printint(va_arg(ap, int), 10, 1);
-            break;
-        case 'x':
-            if (l == 2) printint(va_arg(ap, int64_t), 16, 0);
-            else printint(va_arg(ap, int), 16, 0);
-            break;
-        case 'p':
-            printint((int64_t)va_arg(ap, void *), 16, 0);
-            break;
-        case 'c':
-            putch(va_arg(ap, int));
-            break;
-        case 's':
-            if ((s = (char*)va_arg(ap, char *)) == 0)
-                s = "(null)";
-            for (; *s; s++)
-                putch(*s);
-            break;
-        case '%':
-            putch('%');
+        case C('H'): // 退格键
+        case '\x7f': 
+            if(cons.e != cons.w){
+                cons.e -- ;
+                consputc(BACKSPACE);
+            }
             break;
         default:
-            /* Print unknown % sequence to draw attention. */
-            putch('%');
-            putch(c);
+            if(c != 0 && cons.e - cons.r < INPUT_BUF){
+                c = (c == '\r') ? '\n' : c;
+                consputc(c);
+                cons.buf[cons.e ++ % INPUT_BUF] = c;
+                if(c == '\n' || c == C('D') || cons.e == cons.r + INPUT_BUF){
+                    // 如果到达行尾的话调用 consoleread
+                    cons.w = cons.s;
+                    wakeup(&cons.r);
+                }
+            }
             break;
-        }
     }
+    release_spin_lock(&cons.lock);
 }
-void panic(const char *fmt, ...);
-
-__attribute__((format(printf,1,2)))
-void cprintf(const char *fmt, ...){
-    bool locking = print_lock.locking;
-    if(locking)
-        acquire_spin_lock(&print_lock.lock);
-    if(fmt == NULL){
-        panic("%s: fmt is NULL",__FUNCTION__);
-    }
-    va_list ap;
-    va_start(ap, fmt);
-    vprintfmt(uart_putchar, fmt,ap);
-    va_end(ap);
-    if(locking){
-        release_spin_lock(&print_lock.lock);
-    }
-}
-__attribute__((format(printf,1,2)))
-__attribute__((noreturn))
-void panic(const char *fmt, ...){
-    print_lock.locking = false;
-    va_list ap;
-    va_start(ap, fmt);
-    vprintfmt(uart_putchar, fmt,ap);
-    va_end(ap);
-    cprintf("\t%s:%d: kernel panic.\n", __FILE__, __LINE__);
-    panicked = true;
-    while(1);  
+extern struct devsw devsw[NDEV];
+void consoleinit(void){
+    init_spin_lock(&cons.lock,"console");
+    uart_init();
+    // 配置终端设备驱动
+    devsw[CONSOLE].read = consoleread;
+    devsw[CONSOLE].write = consolewrite;
 }

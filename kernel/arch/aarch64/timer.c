@@ -1,6 +1,6 @@
 #include "timer.h"
 #include "proc/proc.h"
-#include "console.h"
+#include "printf.h"
 #include "arm.h"
 #include "board/raspi3/interupt.h"
 #include "board/raspi3/local_peripherals.h"

@@ -16,6 +16,8 @@
 #define NDEV 10
 #define ROOTDEV 1  // device number of file system root disk
 
+#define INPUT_BUF 128
+
 // mkfs only
 #define FSSIZE 1000  // Size of file system in blocks
 

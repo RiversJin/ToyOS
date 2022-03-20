@@ -1,4 +1,4 @@
-#include "console.h"
+#include "printf.h"
 #include "memory/kalloc.h"
 #include "proc/proc.h"
 #include "interupt/interupt.h"
@@ -12,7 +12,7 @@ extern uint32_t read_irq_src();
 __attribute__((noreturn))
 void main(){
     if(cpuid() == 0){
-        console_init();
+        printinit();
         alloc_init();
         procinit();
         exception_handler_init();

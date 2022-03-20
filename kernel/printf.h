@@ -1,10 +1,10 @@
-#ifndef CONSOLE_H
-#define CONSOLE_H
+#ifndef PRINTF_h
+#define PRINTF_h
 
 #include <stdarg.h>
 #include <stdint.h>
 
-void console_init();
+void printinit();
 void cprintf(const char *fmt, ...);
 void panic(const char *fmt, ...);
 
@@ -22,4 +22,4 @@ void panic(const char *fmt, ...);
         }                                                                      \
     })
 
-#endif // CONSOLE_H
+#endif // PRINTF_h

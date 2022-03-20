@@ -3,7 +3,7 @@
 #include "arch/aarch64/include/trapframe.h"
 #include "proc/proc.h"
 #include "sysproc.h"
-#include "../console.h"
+#include "../printf.h"
 
 static int64_t (*syscalls[])(void) = {
     [SYS_exit]  sys_exit

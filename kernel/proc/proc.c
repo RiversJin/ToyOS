@@ -3,7 +3,7 @@
 #include "../memory/kalloc.h"
 #include "../memory/vm.h"
 #include "../lib/string.h"
-#include "../console.h"
+#include "../printf.h"
 #include "../interupt/interupt.h"
 #include "../fs/fs.h"
 

@@ -1,7 +1,7 @@
 #include "spinlock.h"
 #include "interupt/interupt.h"
 #include "proc/proc.h"
-#include "console.h"
+#include "printf.h"
 
 void init_spin_lock(struct spinlock *lock,const char *name){
     lock->locked = false;

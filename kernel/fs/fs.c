@@ -8,7 +8,7 @@
 #include "../sync/spinlock.h"
 #include "../sync/sleeplock.h"
 #include "../include/param.h"
-#include "../console.h"
+#include "../printf.h"
 #include "../proc/proc.h"
 #define min(a, b) ((a) < (b) ? (a) : (b))
 // 每个磁盘都得有一个超级块 但是我们只运行一个磁盘 这样的话这一个唯一的结构体就够了

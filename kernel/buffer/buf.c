@@ -2,7 +2,7 @@
 #include "sync/spinlock.h"
 #include "sync/sleeplock.h"
 #include "driver/mmc/sd.h"
-#include "console.h"
+#include "printf.h"
 struct bcache {
     struct spinlock lock;
     struct buf buf[NBUF];

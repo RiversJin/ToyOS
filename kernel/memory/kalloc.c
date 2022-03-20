@@ -1,6 +1,6 @@
 #include "kalloc.h"
 #include "internal.h"
-#include "../console.h"
+#include "../printf.h"
 #include "include/util.h"
 #include "include/list.h"
 

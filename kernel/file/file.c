@@ -2,7 +2,7 @@
 #include "file.h"
 #include "fs/fs.h"
 #include "fs/log.h"
-#include "../console.h"
+#include "../printf.h"
 #include "../include/param.h"
 #include "../include/stat.h"
 

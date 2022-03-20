@@ -3,7 +3,7 @@
 #include "sd.h"
 
 #include "arch/aarch64/arm.h"
-#include "console.h"
+#include "printf.h"
 #include "arch/aarch64/board/raspi3/gpio.h"
 #include "arch/aarch64/board/raspi3/mbox.h"
 #include "proc/proc.h"

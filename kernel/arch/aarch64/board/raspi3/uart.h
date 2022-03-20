@@ -15,4 +15,6 @@
 #define AUX_MU_STAT_REG (MMIO_BASE + 0x00215064)
 #define AUX_MU_BAUD_REG (MMIO_BASE + 0x00215068)
 
+#define LSR_RX_READY 1
+#define LSR_TX_IDLE (1<<5)
 #endif // UART_H

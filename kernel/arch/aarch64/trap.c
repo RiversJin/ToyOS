@@ -5,7 +5,7 @@
 #include "arm.h"
 #include "timer.h"
 #include <stdint.h>
-#include "console.h"
+#include "printf.h"
 #include "proc/proc.h"
 
 #include "board/raspi3/uart.h"

@@ -1,7 +1,7 @@
 #include "vm.h"
 #include "arch/aarch64/mmu.h"
 #include "arch/aarch64/arm.h"
-#include "console.h"
+#include "printf.h"
 #include "kalloc.h"
 #include "lib/string.h"
 #include "../proc/proc.h"
