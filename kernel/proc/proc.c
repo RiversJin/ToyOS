@@ -5,6 +5,7 @@
 #include "../lib/string.h"
 #include "../console.h"
 #include "../interupt/interupt.h"
+#include "../fs/fs.h"
 
 struct cpu cpus[NCPU];
 struct process_table{
@@ -66,7 +67,7 @@ struct proc* myproc(void){
  * @brief 初始化进程管理
  * 
  */
-void init_proc(){
+void procinit(){
     init_cpu_info();
     init_spin_lock(&wait_lock,"wait_lock");
     init_spin_lock(&pid_lock,"pid_lock");
@@ -166,7 +167,7 @@ void forkret(){
     release_spin_lock(&p->lock);
     if(first){
         first = 0;
-        // TODO: 记得在这里初始化文件系统 因为文件系统依赖进程的存在 所以不能直接在main中初始化
+        fsinit(ROOTDEV);
     }
     user_trapret();
 }

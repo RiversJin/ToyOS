@@ -68,7 +68,7 @@ struct proc* myproc(void);
 void init_awake_ap_by_spintable();
 void init_cpu_info();
 
-void init_proc();
+void procinit();
 
 void scheduler(void);
 void init_user();

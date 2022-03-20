@@ -3,7 +3,7 @@
 #include "proc/proc.h"
 #include "interupt/interupt.h"
 #include "arch/aarch64/timer.h"
-
+#include "file/file.h"
 #include "buffer/buf.h"
 #include "driver/mmc/sd.h"
 
@@ -14,12 +14,15 @@ void main(){
     if(cpuid() == 0){
         console_init();
         alloc_init();
-        init_proc();
+        procinit();
         exception_handler_init();
         timer_init();
         enable_interrupt();
 
         sd_init();
+        iinit();
+        fileinit();
+
         //init_awake_ap_by_spintable();
         init_user();
     }
