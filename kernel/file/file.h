@@ -42,11 +42,18 @@ struct inode {
 
 // 通过主设备号映射对应的读写函数
 struct devsw{
-    int (*read)(int, uint64_t, int);
-    int (*write)(int, uint64_t, int);
+    int (*read)(char*, int);
+    int (*write)(char*, int);
 };
 
 extern struct devsw devsw[];
 #define CONSOLE 1
 
+void fileinit(void);
+struct file* filealloc(void);
+struct file* filedup(struct file*);
+void fileclose(struct file*);
+
+int32_t filestat(struct file*, struct stat*);
+int32_t fileread(struct file*, char*, int32_t);
 #endif

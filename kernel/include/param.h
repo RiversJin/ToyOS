@@ -12,7 +12,8 @@
 #define LOGSIZE (MAXOPBLOCKS * 3)
 
 #define NINODE 50 //最大的的处于活动状态的 inode 数目
-
+#define NFILE 100 // 操作系统最大可以打开的文件数量
+#define NDEV 10
 #define ROOTDEV 1  // device number of file system root disk
 
 // mkfs only
