@@ -278,3 +278,44 @@ void exit(int status){
     }
     panic("exit: status = %d.\n",status);
 }
+
+void sleep(void* chan, struct spinlock* lk){ 
+    struct proc* p = myproc();
+    acquire_spin_lock(&p->lock);
+    release_spin_lock(lk);
+    p->chan = chan;
+    p->state = SLEEPING;
+
+    sched();
+
+    p->chan = 0;
+    release_spin_lock(&p->lock);
+    acquire_spin_lock(lk);
+}
+
+void wakeup(void *chan){ 
+    for(struct proc* p = process_table.proc; p < &process_table.proc[NPROC]; p++){
+        if(p != myproc()){
+            acquire_spin_lock(&p->lock);
+            if(p->state == SLEEPING && p->chan == chan){
+                p -> state = RUNNABLE;
+            }
+            release_spin_lock(&p->lock);
+        }
+    }
+}
+int32_t kill(int pid){
+    for(struct proc* p = process_table.proc; p < &process_table.proc[NPROC]; p++){ 
+        acquire_spin_lock(&p->lock);
+        if(p->pid = pid){
+            p->killed = 1;
+            if(p->state == SLEEPING){
+                p->state = RUNNABLE;
+            }
+            release_spin_lock(&p->lock);
+            return 0;
+        }
+        release_spin_lock(&p->lock);
+    }
+    return -1;
+}

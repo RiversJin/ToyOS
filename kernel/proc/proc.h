@@ -75,6 +75,7 @@ void init_user();
 
 void exit(int);
 
-void sleep(void* chan, struct spinlock *lk);  /* TODO: implement sleep */
-void wakeup(void* chan); /* TODO: implement wakeup */
+void sleep(void* chan, struct spinlock *lk);
+void wakeup(void* chan);
+int32_t kill(int pid);
 #endif //PROC_H
