@@ -86,7 +86,7 @@ char* strncpy(char *s, const char *t, int n){
   return os;
 }
 
-int strncmp(const char *p, const char *q, int n)
+int strncmp(const char *p, const char *q, unsigned int n)
 {
   while(n > 0 && *p && *p == *q)
     n--, p++, q++;
