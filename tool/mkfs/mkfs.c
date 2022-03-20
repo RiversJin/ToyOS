@@ -10,13 +10,14 @@ typedef uint8_t uchar;
 typedef uint16_t ushort;
 typedef uint32_t uint;
 
+#define stat  xv6_stat  // avoid clash with host struct stat
+#define sleep xv6_sleep
+
 // this file should be compiled with normal gcc...
 
 #include "../../kernel/include/param.h"
 #include "../../kernel/fs/fs.h"
 #include "../../kernel/include/stat.h"
-#define stat  xv6_stat  // avoid clash with host struct stat
-#define sleep xv6_sleep
 
 #ifndef static_assert
 #    define static_assert(a, b)                                                \
