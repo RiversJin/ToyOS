@@ -74,4 +74,7 @@ void scheduler(void);
 void init_user();
 
 void exit(int);
+
+void sleep(void* chan, struct spinlock *lk);  /* TODO: implement sleep */
+void wakeup(void* chan); /* TODO: implement wakeup */
 #endif //PROC_H
