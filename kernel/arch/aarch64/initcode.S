@@ -8,6 +8,7 @@
 user_init_begin:
 mov     x0, -1
 mov     x8, #SYS_exit
-svc     0x0
+#svc     0x0
+nop
 b user_init_begin
 user_init_end:

@@ -1,5 +1,5 @@
-#ifndef INTERUPT_H
-#define INTERUPT_H
+#ifndef IRQ_H
+#define IRQ_H
 #include "local_peripherals.h"
 
 #define IRQ_BASIC_PENDING       (MMIO_BASE + 0xB200)
@@ -21,4 +21,4 @@
 #define IRQ_TIMER               (1 << 11) /* local timer (unused) */
 #define IRQ_GPU                 (1 << 8)
 
-#endif /* INTERUPT_H */
+#endif /* IRQ_H */

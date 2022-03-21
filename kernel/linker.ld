@@ -20,13 +20,13 @@ SECTIONS{
         . = ALIGN(16);
         *(.data .data.*)
     }
-
+    PROVIDE(edata = .);
     .bss : {
         . = ALIGN(16);
         *(.sbss .sbss.*)
         . = ALIGN(16);
         *(.bss .bss.*)
     }
-
+    PROVIDE(edata_end = .);
     PROVIDE(kernel_end = .);
 }

@@ -2,7 +2,7 @@
 #include "proc/proc.h"
 #include "printf.h"
 #include "arm.h"
-#include "board/raspi3/interupt.h"
+#include "board/raspi3/irq.h"
 #include "board/raspi3/local_peripherals.h"
 #define CNTP_CTL_EL0_ENABLE 1
 #define CNTP_CTL_EL0_IMASK (1 << 1)
@@ -26,5 +26,5 @@ void timer_tick_in(uint64_t ms){
 }
 
 void timer_reset(){
-    timer_tick_in(100); // 暂时设置一个时间片0.1s
+    timer_tick_in(10000); // 暂时设置一个时间片0.1s
 }

@@ -7,19 +7,23 @@
 #include "file/file.h"
 #include "buffer/buf.h"
 #include "driver/mmc/sd.h"
+#include "lib/string.h"
 
-extern uint32_t read_irq_src();
+extern void irqinit();
+extern char edata[], edata_end[];
 
 __attribute__((noreturn))
 void main(){
     if(cpuid() == 0){
+        memset(edata,0, edata_end - edata);
         consoleinit();
         printfinit();
         cprintf("kernel booing...\n");
-        panic("");
+        
         alloc_init();
         procinit();
         exception_handler_init();
+        irqinit();
         timer_init();
         enable_interrupt();
 
@@ -29,6 +33,8 @@ void main(){
 
         //init_awake_ap_by_spintable();
         init_user();
+        //scheduler();
+        //while(1);
     }
     
     // timer_init();
