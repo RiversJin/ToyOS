@@ -8,7 +8,7 @@
 
 #define CONTROL_REGISTER (LOCAL_PERIPHERALS_BASE + 0)
 #define CORE_TIMER_PRESCALER (LOCAL_PERIPHERALS_BASE + 0x8)
-#define GPUFIQ2CORE(i) (((i)&0x11) < 2)
+#define GPUFIQ2CORE(i) (((i)&0x11) << 2)
 #define GPUIRQ2CORE(i) ((i)&0x11)
 
 
