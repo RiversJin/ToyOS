@@ -40,7 +40,7 @@ void uart_init(void)
     put32(AUX_MU_LCR_REG, 3);    // 设置串口8bit模式
     put32(AUX_MU_MCR_REG, 0);    // 设置RTS永远为高电平
     put32(AUX_MU_BAUD_REG, 270); // 设置波特率为115200
-    put32(AUX_MU_IIR_REG,0b11<<1 | 0b11 < 6); // 清空接受和发送的FIFO 使能FIFO
+    put32(AUX_MU_IIR_REG,((0b11<<1)|(0b11 < 6))); // 清空接受和发送的FIFO 使能FIFO
     put32(AUX_MU_CNTL_REG, 3);   // 重新使能串口传输
     put32(AUX_MU_IER_REG, 0b11); // 打开串口收发中断 
 

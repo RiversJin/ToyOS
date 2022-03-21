@@ -73,7 +73,7 @@ int consoleread(char* dst, int n){
     return target - n;
 }
 
-void consoleinter(int c){
+void consoleintr(int c){
     acquire_spin_lock(&cons.lock);
     switch(c){
         case C('P'):
@@ -100,7 +100,7 @@ void consoleinter(int c){
                 cons.buf[cons.e ++ % INPUT_BUF] = c;
                 if(c == '\n' || c == C('D') || cons.e == cons.r + INPUT_BUF){
                     // 如果到达行尾的话调用 consoleread
-                    cons.w = cons.s;
+                    cons.w = cons.e;
                     wakeup(&cons.r);
                 }
             }

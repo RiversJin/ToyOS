@@ -4,7 +4,7 @@
 #include <stdarg.h>
 #include <stdint.h>
 
-void printinit();
+void printfinit();
 void cprintf(const char *fmt, ...);
 void panic(const char *fmt, ...);
 

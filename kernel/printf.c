@@ -2,14 +2,14 @@
 #include "include/stdint.h"
 #include <stdbool.h>
 #include "sync/spinlock.h"
-
+#include "console.h"
 
 volatile int panicked = 0;
 static struct print_lock{
     struct spinlock lock;
     bool locking;
 } print_lock;
-
+static char digits[] = "0123456789ABCEDF";
 /**
  * @brief 向串口打印数字
  * 
@@ -18,18 +18,28 @@ static struct print_lock{
  * @param sign 是否有符号
  */
 static void printint(int64_t x,int base, int sign){
-    static char digit[] = "0123456789ABCEDF";
     static char buf[64];
-    if (sign && x < 0) {
+    if(sign && (sign = x < 0)){
         x = -x;
-        uart_putchar('-');
     }
     int i = 0;
     uint64_t t = x;
     do {
-        buf[i++] = digit[t % base];
-    } while (t /= base);
-    while (i--) uart_putchar(buf[i]);
+        buf[i++] = digits[t % base];
+    } while ((t /= base) != 0);
+    if(sign){
+        buf[i++] = '-';
+    }
+    while (i-- >= 0){
+        consputc(buf[i]);
+    }
+}
+static void printptr(uint64_t x){
+    consputc('0');
+    consputc('x');
+    for(int i = 0; i < (sizeof(uint64_t)*2); ++i, x <<= 4){
+        consputc(digits[x >> (sizeof(uint64_t)*8 - 4)]);
+    }
 }
 
 static void vprintfmt(void (*putch)(int), const char *fmt, va_list ap){
@@ -62,7 +72,7 @@ static void vprintfmt(void (*putch)(int), const char *fmt, va_list ap){
             else printint(va_arg(ap, int), 16, 0);
             break;
         case 'p':
-            printint((int64_t)va_arg(ap, void *), 16, 0);
+            printptr((int64_t)va_arg(ap, void *));
             break;
         case 'c':
             putch(va_arg(ap, int));
@@ -96,7 +106,7 @@ void cprintf(const char *fmt, ...){
     }
     va_list ap;
     va_start(ap, fmt);
-    vprintfmt(uart_putchar, fmt,ap);
+    vprintfmt(consputc, fmt,ap);
     va_end(ap);
     if(locking){
         release_spin_lock(&print_lock.lock);
@@ -108,9 +118,14 @@ void panic(const char *fmt, ...){
     print_lock.locking = false;
     va_list ap;
     va_start(ap, fmt);
-    vprintfmt(uart_putchar, fmt,ap);
+    vprintfmt(consputc, fmt,ap);
     va_end(ap);
     cprintf("\t%s:%d: kernel panic.\n", __FILE__, __LINE__);
     panicked = true;
     while(1);  
+}
+
+void printfinit(void){
+    init_spin_lock(&print_lock.lock, "pr");
+    print_lock.locking = 1;
 }

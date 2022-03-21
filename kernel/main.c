@@ -1,3 +1,4 @@
+#include "console.h"
 #include "printf.h"
 #include "memory/kalloc.h"
 #include "proc/proc.h"
@@ -12,7 +13,10 @@ extern uint32_t read_irq_src();
 __attribute__((noreturn))
 void main(){
     if(cpuid() == 0){
-        printinit();
+        consoleinit();
+        printfinit();
+        cprintf("kernel booing...\n");
+        panic("");
         alloc_init();
         procinit();
         exception_handler_init();
