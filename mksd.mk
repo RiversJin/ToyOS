@@ -27,6 +27,7 @@ $(BOOT_IMG): $(KERNEL_IMG) $(shell find boot/*)
 	$(foreach x, $^, mcopy -i $@ $(x) ::$(notdir $(x));)
 
 $(FS_IMG): $(shell find build/user/bin -type f)
+	$(MAKE) -C $(USER_SRC_DIR)
 	mkdir -p build/tool
 	gcc -o build/tool/mkfs tool/mkfs/mkfs.c
 	$(info Our filesystem files: $^)

@@ -6,6 +6,7 @@ OBJCOPY := $(ARCH)-objcopy
 
 SRC_DIR := kernel
 BUILD_DIR := build
+USER_SRC_DIR := user
 
 CFLAGS := -Wall -g -O0 \
           -fno-pie -fno-pic -fno-stack-protector \

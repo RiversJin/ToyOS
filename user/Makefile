@@ -18,6 +18,8 @@ MKSYSCALL_TOOL := $(TOOL_DIR)/mksyscall/mksyscall.py
 
 USYSCALL_S := $(USER_SRC_DIR)/lib/usyscall.S
 
+all: $(BUILD_DIR)/user/bin/init
+
 $(USYSCALL_S) : $(KERNEL_SRC_DIR)/syscall/syscall.h
 	mkdir -p $(dir $@)
 	python3 $(MKSYSCALL_TOOL) $^ > $@
@@ -26,15 +28,15 @@ $(BUILD_DIR)/user/obj/lib/usyscall.S.o: $(USER_SRC_DIR)/lib/usyscall.S
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c -o $@ $^
 
-$(BUILD_DIR)/user/obj/test/test.c.o: $(USER_SRC_DIR)/test/test.c
+$(BUILD_DIR)/user/obj/init/init.c.o: $(USER_SRC_DIR)/init/init.c
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c -o $@ $^
 
-$(BUILD_DIR)/user/bin/test: $(BUILD_DIR)/user/obj/test/test.c.o $(BUILD_DIR)/user/obj/lib/usyscall.S.o
+$(BUILD_DIR)/user/bin/init: $(BUILD_DIR)/user/obj/init/init.c.o $(BUILD_DIR)/user/obj/lib/usyscall.S.o
 	mkdir -p $(dir $@)
 	$(LD) -N -e main -Ttext 0 -o $@ $^
 
-all: $(BUILD_DIR)/user/bin/test
+
 
 .PHONY: clean
 clean:
