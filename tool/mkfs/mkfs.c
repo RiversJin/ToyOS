@@ -17,6 +17,8 @@ typedef uint32_t uint;
 
 #include "../../kernel/include/param.h"
 #include "../../kernel/fs/fs.h"
+
+#define ialloc xv6_ialloc
 #include "../../kernel/include/stat.h"
 
 #ifndef static_assert

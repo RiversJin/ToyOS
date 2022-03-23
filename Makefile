@@ -32,10 +32,21 @@ $(BUILD_DIR)/%.S.o: %.S
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-$(KERNEL_ELF): $(LINKER_SCRIPT) $(OBJS)
-	$(LD) -o $@ -T $< $(OBJS)
+$(KERNEL_ELF): $(LINKER_SCRIPT) $(OBJS) $(BUILD_DIR)/$(USER_SRC_DIR)/initcode.bin
+	$(LD) -T $< -o $@  $(OBJS) -b binary $(BUILD_DIR)/$(USER_SRC_DIR)/initcode.bin
 	$(OBJDUMP) -S -D $@ > $(basename $@).asm
 	$(OBJDUMP) -x $@ > $(basename $@).hdr
+
+$(BUILD_DIR)/$(USER_SRC_DIR)/initcode.bin: $(USER_SRC_DIR)/initcode.S
+	@echo + as $<
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c -o $(BUILD_DIR)/$(USER_SRC_DIR)/initcode.o $<
+	@echo + ld $(BUILD_DIR)/$(USER_SRC_DIR)/initcode.out
+	$(LD) -N -e start -Ttext 0 -o $(BUILD_DIR)/$(USER_SRC_DIR)/initcode.out $(BUILD_DIR)/$(USER_SRC_DIR)/initcode.o
+	@echo + objcopy $@
+	$(OBJCOPY) -S -O binary --prefix-symbols="_binary_user_initcode" $(BUILD_DIR)/$(USER_SRC_DIR)/initcode.out $@
+	@echo + objdump $(BUILD_DIR)/$(USER_SRC_DIR)/initcode.o
+	$(OBJDUMP) -S $(BUILD_DIR)/$(USER_SRC_DIR)/initcode.o > $(BUILD_DIR)/$(USER_SRC_DIR)/initcode.asm
 
 $(KERNEL_IMG): $(KERNEL_ELF)
 	$(OBJCOPY) -O binary $< $@

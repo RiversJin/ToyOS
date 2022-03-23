@@ -268,7 +268,7 @@ void uvmfree(pagetable_t pagetable, uint64_t level){
  * @param pgdir 
  * @param va 
  */
-void unmclear(uint64_t *pgdir, uint8_t *va){
+void uvmclear(uint64_t *pgdir, uint8_t *va){
     uint64_t *pte = walk(pgdir, (uint64_t)va, 0, NULL);
     if(pte == NULL){
         panic("uvmclear: failed to get the PTE. \n");

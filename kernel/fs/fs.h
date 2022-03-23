@@ -75,6 +75,8 @@ struct dirent {
 void iput(struct inode *ip);
 void ilock(struct inode* ip);
 void iunlock(struct inode* ip);
+struct inode* ialloc(uint32_t dev, uint16_t type);
+void itrunc(struct inode *ip);
 void stati(struct inode* ip, struct stat* st);
 int readi(struct inode *ip, char* dst, uint32_t offset, uint32_t n);
 int writei(struct inode *ip, char* src, uint32_t offset, uint32_t n);

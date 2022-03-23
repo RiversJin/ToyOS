@@ -23,4 +23,6 @@ char* safestrcpy(char *s, const char *t, int n);
 char* strncpy(char *s, const char *t, int n);
 
 int strncmp(const char *p, const char *q, unsigned int n);
+
+int strlen(const char *s);
 #endif // STRING_H

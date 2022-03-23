@@ -7,6 +7,7 @@
 #include "../fs/log.h"
 #include "../proc/proc.h"
 #include "../printf.h"
+#include "../lib/string.h"
 
 static int fdalloc(struct file *f){
   int fd;
@@ -23,7 +24,7 @@ static int argfd(int n, int64_t *pfd, struct file **pf){
   int64_t fd;
   struct file *f;
 
-  if(argint(n, &fd) < 0)
+  if(argint(n, (uint64_t*)&fd) < 0)
     return -1;
   if(fd < 0 || fd >= NOFILE || (f=myproc()->ofile[fd]) == 0)
     return -1;
@@ -83,8 +84,8 @@ int64_t sys_mknod(){
     struct inode *ip;
     begin_op();
     if(argstr(0,&path) < 0 || 
-        argint(1,&major) <0 || 
-        argint(1,&minor) < 0 ||
+        argint(1,(uint64_t*)&major) <0 || 
+        argint(1,(uint64_t*)&minor) < 0 ||
         (ip = create(path, T_DEVICE, major, minor)) == NULL){
             end_op();
             return -1;
@@ -99,7 +100,7 @@ int64_t sys_open(){
     int64_t fd;
     int64_t mode;
     int path_size;
-    if((path_size = argstr(0, &path)) < 0 || argint(1,&mode) < 0){
+    if((path_size = argstr(0, &path)) < 0 || argint(1,(uint64_t*)&mode) < 0){
         return -1;
     }
     struct inode *ip;
@@ -167,7 +168,7 @@ int64_t sys_close(){
         return -1;
     }
     myproc()->ofile[fd] = 0;
-    fileclose(fd);
+    fileclose(file);
     return 0;
 }
 // int read(int, void*, int);
@@ -175,7 +176,7 @@ int64_t sys_read(){
     struct file *file;
     int64_t n;
     char *p;
-    if(argfd(0,0,&file) < 0 || argint(2,&n) < 0 || argptr(1,&p,n) < 0){
+    if(argfd(0,0,&file) < 0 || argint(2,(uint64_t*)&n) < 0 || argptr(1,&p,n) < 0){
         return -1;
     }
     return fileread(file,p,n);
@@ -185,7 +186,7 @@ int64_t sys_write(){
     struct file *file;
     int64_t n;
     char *p;
-    if(argfd(0,0,&file) < 0 || argint(2,&n) < 0 || argptr(1,&p,n) < 0){
+    if(argfd(0,0,&file) < 0 || argint(2,(uint64_t*)&n) < 0 || argptr(1,&p,n) < 0){
         return -1;
     }
     return filewrite(file,p,n);
@@ -197,18 +198,18 @@ int64_t sys_exec(){
     char *path;
     char *argv[MAXARG];
     uint64_t uargv;
-    int64_t uarg;
-    if(argstr(0,&path) < 0 || argint(1,&argv) < 0){
+    int64_t uarg = 0;
+    if(argstr(0,&path) < 0 || argint(1,(uint64_t*)&uargv) < 0){
         cprintf("sys_exec: invalid arguments\n");
         return -1;
     }
     memset(argv,0,sizeof(argv));
     for(int i=0; ; ++i){
-        if(i>=ARRAY_SIZE(argv)){
+        if(i >= ARRAY_SIZE(argv)){
             cprintf("sys_exec: too many arguments.\n");
             return -1;
         }
-        if (fetchint(uargv + sizeof(uint64_t) * i, &uarg) < 0) {
+        if (fetchint64ataddr(uargv + sizeof(uint64_t) * i, (uint64_t*)&uarg) < 0) {
             cprintf("sys_exec: failed to fetch uarg.\n");
             return -1;
         }

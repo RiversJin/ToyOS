@@ -94,3 +94,11 @@ int strncmp(const char *p, const char *q, unsigned int n)
     return 0;
   return (unsigned char)*p - (unsigned char)*q;
 }
+
+int strlen(const char *s) {
+  int n;
+
+  for(n = 0; s[n]; n++)
+    ;
+  return n;
+}
