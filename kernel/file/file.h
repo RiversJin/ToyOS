@@ -42,4 +42,5 @@ void fileclose(struct file*);
 
 int32_t filestat(struct file*, struct stat*);
 int32_t fileread(struct file*, char*, int32_t);
+int32_t filewrite(struct file* f, char* addr, int32_t n);
 #endif

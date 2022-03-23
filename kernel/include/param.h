@@ -15,8 +15,10 @@
 #define NFILE 100 // 操作系统最大可以打开的文件数量
 #define NDEV 10
 #define ROOTDEV 1  // device number of file system root disk
-
+#define MAXARG       32  // max exec arguments
 #define INPUT_BUF 128
+
+#define MAXPATH      128   // maximum file path name
 
 // mkfs only
 #define FSSIZE 1000  // Size of file system in blocks

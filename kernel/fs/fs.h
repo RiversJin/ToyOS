@@ -80,4 +80,10 @@ int readi(struct inode *ip, char* dst, uint32_t offset, uint32_t n);
 int writei(struct inode *ip, char* src, uint32_t offset, uint32_t n);
 void fsinit(int);
 void iinit(void);
+struct inode* nameiparent(char *path, char *name);
+void iunlockandput(struct inode *ip);
+struct inode* dirlookup(struct inode* dp, char *name, uint32_t *poff);
+void iupdate(struct inode *ip);
+int dirlink(struct inode *dp, char *name, uint32_t inum);
+struct inode* namei(char *path);
 #endif /* FS_H */
