@@ -9,5 +9,6 @@ extern int64_t sys_mknod();
 extern int64_t sys_open();
 extern int64_t sys_close();
 extern int64_t sys_read();
+extern int64_t sys_write();
 
 #endif /* SYSPROC_H */

@@ -203,6 +203,7 @@ int64_t sys_exec(){
         cprintf("sys_exec: invalid arguments\n");
         return -1;
     }
+    
     memset(argv,0,sizeof(argv));
     for(int i=0; ; ++i){
         if(i >= ARRAY_SIZE(argv)){

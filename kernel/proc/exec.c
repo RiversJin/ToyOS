@@ -142,7 +142,7 @@ static int loadseg(pagetable_t pgdir, uint64_t va, struct inode *ip, uint32_t of
     for(int i=0; i < sz; i += PGSIZE){
         uint64_t pa = walkaddr(pgdir, va + i);
         if (pa == 0){
-            panic("loadseg: address %ll not exist.\n", va + i);
+            panic("loadseg: address %p not exist.\n", va + i);
         }
         uint32_t n;
         if(sz - i < PGSIZE)

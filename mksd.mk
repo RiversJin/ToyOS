@@ -26,13 +26,14 @@ $(BOOT_IMG): $(KERNEL_IMG) $(shell find boot/*)
 	mkfs.vfat -F 32 -s 1 $@
 	$(foreach x, $^, mcopy -i $@ $(x) ::$(notdir $(x));)
 
-$(FS_IMG): $(shell find build/user/bin -type f)
+$(FS_IMG): $(BUILD_DIR)/user/bin/init $(shell find build/user/bin -type f)
 	$(MAKE) -C $(USER_SRC_DIR)
 	mkdir -p build/tool
 	gcc -o build/tool/mkfs tool/mkfs/mkfs.c
 	$(info Our filesystem files: $^)
 	$(BUILD_DIR)/tool/mkfs $@ $^
-
+$(BUILD_DIR)/user/bin/init: 
+	$(MAKE) -C $(USER_SRC_DIR)
 
 $(SD_IMG): $(FS_IMG) $(BOOT_IMG)
 	dd if=/dev/zero of=$@ seek=$(shell echo $$(($(SECTORS) - 1))) bs=$(SECTOR_SIZE) count=1

@@ -11,5 +11,7 @@ start:
 cmd:
     .string "/init\0"
 argv:
-    .word cmd
-    .word 0
+    .long cmd
+    .long 0
+    .long 0
+    .long 0

@@ -109,13 +109,14 @@ main(int argc, char* argv[])
 
     sb.magic = xint(FSMAGIC);
     sb.size = xint(FSSIZE);
+    
     sb.nblocks = xint(nblocks);
     sb.ninodes = xint(NINODES);
     sb.nlog = xint(nlog);
     sb.logstart = xint(2);
     sb.inodestart = xint(2 + nlog);
     sb.bmapstart = xint(2 + nlog + ninodeblocks);
-
+    printf("!!!! %d \n",sb.bmapstart);
     printf(
         "nmeta %d (boot, super, log blocks %u inode blocks %u, bitmap blocks %u) blocks %d total %d\n",
         nmeta, nlog, ninodeblocks, nbitmap, nblocks, FSSIZE);

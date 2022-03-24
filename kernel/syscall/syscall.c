@@ -6,7 +6,14 @@
 #include "../printf.h"
 
 static int64_t (*syscalls[])(void) = {
-    [SYS_exit]  sys_exit
+    [SYS_exec] sys_exec,
+    [SYS_exit] sys_exit,
+
+    [SYS_mknod] sys_mknod,
+    [SYS_open] sys_open,
+    [SYS_close] sys_close,
+    [SYS_read] sys_read,
+    [SYS_write] sys_write,
 };
 
 int64_t syscall(struct trapframe *frame){
@@ -101,5 +108,5 @@ int64_t argptr(int n,char** pp,int size){
 int64_t argstr(int n, char** pp){
     uint64_t addr;
     if(argint(n,&addr) < 0)return -1;
-    return fetchstr(n,pp);
+    return fetchstr(addr,pp);
 }

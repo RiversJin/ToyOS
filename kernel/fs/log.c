@@ -160,7 +160,9 @@ void log_write(struct buf *b){
             break;
         }
     }
-    log.lh.block[i] = b->blockno;
+    // 暂时的解决方案
+    const uint32_t LBA = 0x20800; 
+    log.lh.block[i] = b->blockno - LBA;
     if(i == log.lh.n){
         bpin(b);
         log.lh.n += 1;

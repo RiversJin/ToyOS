@@ -298,8 +298,8 @@ static uint32_t bmap(struct inode *ip, uint32_t bn){
         uint32_t addr = ip->addrs[bn];
         if(addr==0){
             ip -> addrs[bn] = addr = balloc(ip->dev);
-            return addr;
         }
+        return addr;
     }
     // 如果是间接块的话
     if(bn < NINDIRECT){

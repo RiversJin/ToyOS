@@ -30,6 +30,8 @@ static pte_t* walk(pagetable_t pagetable_ptr, uint64_t va,bool alloc,int* rlevel
         pte_t* pte = &pagetable_ptr[PX(level,va)];
         if( (*pte & PTE_VALID) != 0){
             pagetable_ptr = (pagetable_t)PA2VA(PTE_ADDR(*pte));
+
+            // fix 遍历算法有问题 要改
             if((*pte & PTE_BLOCK)) break;
         }else{
             if(!alloc) return NULL;
