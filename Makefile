@@ -10,7 +10,7 @@ USER_SRC_DIR := user
 
 CFLAGS := -Wall -g -O0 \
           -fno-pie -fno-pic -fno-stack-protector \
-          -static -fno-builtin -nostdlib -ffreestanding -nostartfiles \
+          -static -fno-builtin -nostdlib -ffreestanding -nostartfiles -mcmodel=large \
           -mgeneral-regs-only \
 	      -MMD -MP -Ikernel/
 LINKER_SCRIPT := $(SRC_DIR)/linker.ld
@@ -44,7 +44,7 @@ $(BUILD_DIR)/$(USER_SRC_DIR)/initcode.bin: $(USER_SRC_DIR)/initcode.S
 	@echo + ld $(BUILD_DIR)/$(USER_SRC_DIR)/initcode.out
 	$(LD) -N -e start -Ttext 0 -o $(BUILD_DIR)/$(USER_SRC_DIR)/initcode.out $(BUILD_DIR)/$(USER_SRC_DIR)/initcode.o
 	@echo + objcopy $@
-	$(OBJCOPY) -S -O binary --prefix-symbols="_binary_user_initcode" $(BUILD_DIR)/$(USER_SRC_DIR)/initcode.out $@
+	$(OBJCOPY) -S -O binary $(BUILD_DIR)/$(USER_SRC_DIR)/initcode.out $@
 	@echo + objdump $(BUILD_DIR)/$(USER_SRC_DIR)/initcode.o
 	$(OBJDUMP) -S $(BUILD_DIR)/$(USER_SRC_DIR)/initcode.o > $(BUILD_DIR)/$(USER_SRC_DIR)/initcode.asm
 

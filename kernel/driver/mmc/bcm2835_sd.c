@@ -549,7 +549,6 @@ sd_init()
      * Remember to call sd_init() at somewhere.
      */
 
-    binit();
     _sd_init();
     asserts(sd_card.init, "\tFailed to initialize SD card.\n");
 
@@ -664,11 +663,11 @@ sd_intr()
 void
 sd_rw(struct buf* b)
 {
-    acquire_sleep_lock(&b->lock);
+    //acquire_sleep_lock(&b->lock);
     _sd_start(b);
     b->flags &= ~BUF_DIRTY;
     b->flags |= BUF_VALID;
-    brelease(b);
+    //brelease(b);
 }
 
 /* SD card test and benchmark. */

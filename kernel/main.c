@@ -26,7 +26,7 @@ void main(){
         irqinit();
         timer_init();
         enable_interrupt();
-
+        binit();
         sd_init();
         iinit();
         fileinit();

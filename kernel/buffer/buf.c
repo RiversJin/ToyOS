@@ -81,7 +81,7 @@ void bwrite(struct buf* b){
 
 struct buf* bread(uint32_t dev, uint32_t blockno){
     const uint32_t LBA = 0x20800; //TODO: 这个地方记得改为动态解析 虽然硬编码也不是不行...
-    struct buf* b = bget(dev,blockno + LBA);
+    struct buf* b = bget(dev, blockno + LBA);
     if(!(b->flags & BUF_VALID)){
         sd_rw(b);
     }
