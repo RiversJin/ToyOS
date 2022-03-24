@@ -34,7 +34,7 @@
 .macro kernel_exit el, ret = 0
     ldp     x21,x22, [sp, #16*16]
     .if     \el == 0
-        ldr     x23, [sp, #8*33]
+        ldr     x23, [sp, #8*31]
         msr     sp_el0, x23
     .endif
     msr     elr_el1, x21
@@ -145,7 +145,7 @@ ENTRY(user_trapret)
     ldp     x21,x22, [sp, #16*16]
 
 #    .if     \el == 0
-    ldr     x23, [sp, #8*33]
+    ldr     x23, [sp, #8*31]
     msr     sp_el0, x23
 #    .endif
     msr     elr_el1, x21

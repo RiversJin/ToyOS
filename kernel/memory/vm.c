@@ -31,8 +31,7 @@ static pte_t* walk(pagetable_t pagetable_ptr, uint64_t va,bool alloc,int* rlevel
         if( (*pte & PTE_VALID) != 0){
             pagetable_ptr = (pagetable_t)PA2VA(PTE_ADDR(*pte));
 
-            // fix 遍历算法有问题 要改
-            if((*pte & PTE_BLOCK)) break;
+            if((*pte & 0b11) == PTE_BLOCK) break;
         }else{
             if(!alloc) return NULL;
             if((pagetable_ptr = (pagetable_t)kalloc(PGSIZE)) == NULL){
@@ -249,7 +248,7 @@ void uvmfree(pagetable_t pagetable, uint64_t level){
         return;
     }
     //由于PTE_FLAG是取低12位的值 如果其不等于零 也就意味着没有此地址没有4k对齐
-    if(PTE_FLAG(pagetable)!=0){
+    if(((uint64_t)pagetable & 0xFFF)!=0){
         panic("uvmfree: invalid pte. \n");
     }
     if(level == 0){
