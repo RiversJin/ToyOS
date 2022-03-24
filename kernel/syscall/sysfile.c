@@ -80,12 +80,14 @@ static struct inode* create(char *path, int16_t type, int16_t major, int16_t min
 // int mknod(path,major,minor)
 int64_t sys_mknod(){
     char *path = NULL;
-    int major, minor;
+    int64_t major, minor;
     struct inode *ip;
+    if(argstr(0,&path) < 0){
+        return -1;
+    }
     begin_op();
-    if(argstr(0,&path) < 0 || 
-        argint(1,(uint64_t*)&major) <0 || 
-        argint(1,(uint64_t*)&minor) < 0 ||
+    if( argint(1,(uint64_t*)&major) < 0 || 
+        argint(2,(uint64_t*)&minor) < 0 ||
         (ip = create(path, T_DEVICE, major, minor)) == NULL){
             end_op();
             return -1;

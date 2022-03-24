@@ -189,8 +189,7 @@ void init_user(){
     p->tf->regs[30] = 0; //initcode位于进程地址空间的0处
     
     safestrcpy(p->name,"initcode",sizeof(p->name));
-    // TODO: 记得这里要设定当前工作目录
-    // p->cwd = ...
+    p->cwd = namei("/");
     p->state = RUNNABLE;
     release_spin_lock(&p->lock);
 
@@ -277,7 +276,28 @@ void exit(int status){
     if(p == initproc){
         panic("init proc exit with status code %d\n",status);
     }
-    panic("exit: status = %d.\n",status);
+    
+    // 关闭进程所有打开的文件
+    for(int fd = 0; fd < NOFILE; ++fd){
+        if(p->ofile[fd] != NULL){
+            struct file* f = p->ofile[fd];
+            fileclose(f);
+            p->ofile[fd] = NULL;
+        }
+    }
+    begin_op();
+    iput(p->cwd);
+    end_op();
+
+    p->cwd = NULL;
+
+
+    // TODO:
+    // 1. 将此已退出进程的子进程设置为此进程的父进程的子进程
+    // 2. 如果父进程调用wait()的话 苏醒父进程
+    // 3. 调用sched重新调度
+
+    panic("exit: zombie exit.\n");
 }
 
 void sleep(void* chan, struct spinlock* lk){ 
