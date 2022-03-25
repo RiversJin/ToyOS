@@ -10,3 +10,9 @@ int64_t sys_exit(){
     exit(n);
     return 0;
 }
+
+
+// int getpid(void)
+int64_t sys_getpid(){
+    return myproc()->pid;
+}
