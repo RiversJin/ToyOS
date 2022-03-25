@@ -228,3 +228,19 @@ int64_t sys_exec(){
     }
     return exec(path,argv);
 }
+
+// int dup(int);
+int64_t sys_dup(){
+    struct file *file;
+    int64_t fd;
+    if(argfd(0,NULL,&file) < 0) {
+        cprintf("sys_dup: failed to fetch fd.\n");
+        return -1;
+    }
+    if((fd = fdalloc(file)) < 0){
+        cprintf("sys_dup: failed to allocate file.\n");
+        return -1;
+    }
+    filedup(file);
+    return fd;
+}
