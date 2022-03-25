@@ -6,6 +6,7 @@
 #include "../printf.h"
 #include "../interupt/interupt.h"
 #include "../fs/fs.h"
+#include "../fs/log.h"
 
 struct cpu cpus[NCPU];
 struct process_table{
@@ -339,4 +340,46 @@ int32_t kill(int pid){
         release_spin_lock(&p->lock);
     }
     return -1;
+}
+
+int32_t fork(void){
+    struct proc* parent_proc = myproc();
+    struct proc* child_proc = allocproc();
+    if(child_proc == NULL){
+        return -1;
+    }
+    // 将父进程内存复制到子进程中
+    if(uvmcopy(parent_proc->pagetable, child_proc->pagetable, parent_proc->sz) < 0){
+        freeproc(child_proc);
+        release_spin_lock(&child_proc->lock);
+        cprintf("fork: copy memory to child process failed.\n");
+        return -1;
+    }
+    child_proc->sz = parent_proc->sz;
+    // 复制寄存器
+    *(child_proc->tf) = *(parent_proc->tf);
+    // 子进程返回值为0
+    child_proc->tf->regs[0] = 0;
+    // 父子进程打开文件同步
+    for(int i = 0; i < NOFILE; ++i){
+        if(parent_proc->ofile[i] != NULL){
+            child_proc->ofile[i] = filedup(parent_proc->ofile[i]);
+        }
+    }
+    // 配置工作目录
+    child_proc->cwd = parent_proc->cwd;
+    strncpy(child_proc->name, parent_proc->name, sizeof(child_proc->name));
+
+    int child_pid = child_proc->pid;
+    release_spin_lock(&child_proc->lock);
+
+    acquire_spin_lock(&wait_lock);
+    child_proc->parent = parent_proc;
+    release_spin_lock(&wait_lock);
+
+    acquire_spin_lock(&child_proc->lock);
+    child_proc->state = RUNNABLE;
+    release_spin_lock(&child_proc->lock);
+
+    return child_pid;
 }

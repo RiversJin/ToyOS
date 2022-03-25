@@ -78,4 +78,5 @@ void exit(int);
 void sleep(void* chan, struct spinlock *lk);
 void wakeup(void* chan);
 int32_t kill(int pid);
+int32_t fork(void);
 #endif //PROC_H

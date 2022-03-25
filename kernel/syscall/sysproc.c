@@ -16,3 +16,8 @@ int64_t sys_exit(){
 int64_t sys_getpid(){
     return myproc()->pid;
 }
+
+// int fork(void)
+int64_t sys_fork(){
+    return fork();
+}

@@ -4,6 +4,7 @@
 
 extern int64_t sys_exit();
 extern int64_t sys_exec();
+extern int64_t sys_fork();
 extern int64_t sys_getpid();
 
 extern int64_t sys_mknod();

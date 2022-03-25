@@ -2,9 +2,15 @@
 #define USER_H
 int exec(char*, char**);
 int exit(int) __attribute__((noreturn));
-int open(const char*, int);
+int getpid();
+int fork();
+
 int mknod(const char*, short, short);
-int write(int, const void*, int);
-int read(int, void*, int);
+int open(const char*, int);
 int close(int);
+int read(int, void*, int);
+int write(int, const void*, int);
+int dup(int);
+
+
 #endif /* USER_H */
