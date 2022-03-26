@@ -30,15 +30,16 @@ void main(){
         sd_init();
         iinit();
         fileinit();
-
-        //init_awake_ap_by_spintable();
         init_user();
+        init_awake_ap_by_spintable();
         //scheduler();
         //while(1);
+    }else{
+        exception_handler_init();
+        timer_init();
+        enable_interrupt();
     }
     
-    // timer_init();
-    // enable_interrupt();
     cprintf("main: [CPU %d] started.\n", cpuid());
     scheduler();
     while(1){

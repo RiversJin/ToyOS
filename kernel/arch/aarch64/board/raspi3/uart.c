@@ -21,12 +21,6 @@ static inline int is_send_buffer_empty(){
 static inline int is_recv_buffer_not_empty(){
     return (get32(AUX_MU_IIR_REG) & (1 << 2)) != 0;
 }
-static inline void enable_sent_interrupt(void){
-    put32(AUX_MU_IER_REG, get32(AUX_MU_IER_REG)|0x1);
-}
-static inline void disable_sent_interrupt(void){
-    put32(AUX_MU_IER_REG, get32(AUX_MU_IER_REG) & ~0x1);
-}
 
 /**
  * @brief 初始化串口
@@ -58,7 +52,7 @@ void uart_init(void)
     put32(AUX_MU_IIR_REG,((0b11<<1)|(0b11 << 6))); // 清空接受和发送的FIFO 使能FIFO
     put32(AUX_MU_CNTL_REG, 3);   // 重新使能串口传输
     //put32(AUX_MU_IER_REG, 0b11); // 打开串口收发中断 
-    enable_sent_interrupt();
+    //enable_sent_interrupt();
 }
 /**
  * @brief 向串口发送一个字符 异步
@@ -73,7 +67,7 @@ void uart_putchar(int c)
     }
     while(1){
         if(uart_tx_w == uart_tx_r + UART_TXBUF_SIZE){
-            enable_sent_interrupt();
+            //enable_sent_interrupt();
             // 此时buffer已满 等待
             sleep(&uart_tx_r, &uart_tx_lock);
         } else {
@@ -108,7 +102,7 @@ void uart_putchar_sync(int c){
 void uart_start(){
     while(1){
         if(uart_tx_w == uart_tx_r){
-            disable_sent_interrupt();
+            //disable_sent_interrupt();
             return; // 队列为空 直接退出即可 
         }   
         if((get32(AUX_MU_LSR_REG) & LSR_TX_IDLE) == 0){
@@ -139,17 +133,16 @@ int uart_getchar(void){
 extern void consoleintr(int c);
 
 void uartintr(void){
-    if(is_recv_buffer_not_empty()){
-        while(1){
-            int c = uart_getchar();
-            if( c == -1){
-                break;
-            }
-            consoleintr(c);
+    while(1){
+        int c = uart_getchar();
+        if( c == -1){
+            break;
         }
-    }else if(is_send_buffer_empty()){
-        acquire_spin_lock(&uart_tx_lock);
-        uart_start();
-        release_spin_lock(&uart_tx_lock);
+        consoleintr(c);
     }
+    
+    acquire_spin_lock(&uart_tx_lock);
+    uart_start();
+    release_spin_lock(&uart_tx_lock);
+    
 }

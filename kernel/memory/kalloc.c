@@ -3,6 +3,9 @@
 #include "../printf.h"
 #include "include/util.h"
 #include "include/list.h"
+#include "../sync/spinlock.h"
+
+struct spinlock alloc_lock;
 
 #define MAX_ORDER 11
 
@@ -129,6 +132,7 @@ void alloc_init(void){
     }
     
     _free_pages_range(pg_range.begin,pg_range.end);
+    init_spin_lock(&alloc_lock,"alloc");
     log_alloc_system_info();
     cprintf("memory manage system initialized.\n");
 }
@@ -180,9 +184,12 @@ void* kalloc(size_t size){
     }
     struct page* page;
     pg_idx_t pg_idx;
+
+    acquire_spin_lock(&alloc_lock);
     if(kalloc_pages(&page,&pg_idx,pages_n) != 0){
         return NULL;
     }
+    release_spin_lock(&alloc_lock);
     return (void*)PA2VA(PFn2PHY(pg_idx));
 }
 int kalloc_pages(struct page** page,pg_idx_t* pfn,int pages_n){
@@ -211,6 +218,7 @@ void kfree_page(pg_idx_t pfn){
     _free_page(pfn,order);
 }
 void kfree(void *ptr){
+    acquire_spin_lock(&alloc_lock);
     pg_idx_t pfn = PHY2PFn((void*)VA2PA(ptr));
     struct page* page = pages+pfn;
     if(!is_page_used(page)){
@@ -219,4 +227,5 @@ void kfree(void *ptr){
     set_page_unused(page);
     order_t order = get_page_order(page);
     _free_one_page(page,pfn,order);
+    release_spin_lock(&alloc_lock);
 }

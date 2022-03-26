@@ -231,12 +231,15 @@ void scheduler(void){
     
     struct cpu *c = mycpu();
     c -> proc = NULL;
-    
+    if(cpuid() == 0){
+        while(1);
+    }
     while(1){
         enable_interrupt(); // 设备可能会中断
         for(struct proc *p = process_table.proc; p < &process_table.proc[NPROC]; ++p){
             acquire_spin_lock(&p->lock);
             if(p->state == RUNNABLE){
+                cprintf("cpu %d to %s\n",cpuid(),p->name);
                 p->state = RUNNING;
                 c->proc = p;
                 uvmswitch(p);

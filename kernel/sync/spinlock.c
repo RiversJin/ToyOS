@@ -1,7 +1,7 @@
 #include "spinlock.h"
 #include "interupt/interupt.h"
 #include "proc/proc.h"
-#include "printf.h"
+#include "../printf.h"
 
 void init_spin_lock(struct spinlock *lock,const char *name){
     lock->locked = false;
@@ -38,7 +38,8 @@ void acquire_spin_lock(struct spinlock *lock){
     if(is_current_cpu_holding_spin_lock(lock)){
         panic("acquire_spin_lock: the lock (%s) is already held by %lu \n",lock->name,cpuid());
     }
-    while(__sync_lock_test_and_set(&lock->locked,true) != false);
+    while (lock->locked || __atomic_test_and_set(&lock->locked, __ATOMIC_ACQUIRE)) {
+    }
     __sync_synchronize();
     lock->cpu = mycpu();
 }
