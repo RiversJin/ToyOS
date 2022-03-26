@@ -138,6 +138,16 @@ static struct proc * allocproc(void){
     cprintf("alloc_proc: process %d allocated. \n",p->pid);
     return p;
 }
+
+void reparent(struct proc *p){
+    for(struct proc *child_proc = process_table.proc; child_proc < &process_table.proc[NPROC]; child_proc ++){
+        if(child_proc->parent == p){
+            child_proc->parent = initproc;
+            wakeup(initproc);
+        }
+    }
+}
+
 /**
  * @brief 释放一个进程
  * 
@@ -293,12 +303,17 @@ void exit(int status){
 
     p->cwd = NULL;
 
-
-    // TODO:
+    acquire_spin_lock(&wait_lock);
     // 1. 将此已退出进程的子进程设置为此进程的父进程的子进程
+    reparent(p);
     // 2. 如果父进程调用wait()的话 苏醒父进程
+    wakeup(p->parent);
     // 3. 调用sched重新调度
-
+    acquire_spin_lock(&p->lock);
+    p->xstate = status;
+    p->state = ZOMBIE;
+    release_spin_lock(&wait_lock);
+    sched();
     panic("exit: zombie exit.\n");
 }
 
