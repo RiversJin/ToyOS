@@ -63,7 +63,7 @@ void unmunmap(pagetable_t pagetable,uint64_t va,uint64_t npages, int do_free){
             panic("unmunmap: note a leaf. \n");
         }
         if(do_free){
-            uint64_t pa = VA2PA(PTE_ADDR(*pte));
+            uint64_t pa = PA2VA(PTE_ADDR(*pte));
             kfree((void*)pa);
         }
         *pte = 0;
@@ -221,7 +221,7 @@ int uvmcopy(pagetable_t old, pagetable_t new, uint64_t sz){
         if(((*pte)&PTE_VALID) == 0){
             panic("uvmcopy: page note present. \n");
         }
-        uint64_t pa = VA2PA(PTE_ADDR(*pte));
+        uint64_t pa = PA2VA(PTE_ADDR(*pte));
         uint64_t flags = PTE_FLAG(*pte);
         uint8_t *mem = kalloc(PGSIZE);
         if(mem == NULL){
@@ -260,8 +260,8 @@ void uvmfree(pagetable_t pagetable, uint64_t level){
             uint64_t *v = (uint64_t*)PA2VA(PTE_ADDR(pagetable[i]));
             uvmfree(v,level-1);
         }
-        kfree(pagetable);
     }
+    kfree(pagetable);
 }
 /**
  * @brief 将一个PTE标记为用户态不可使用 用来给stack做内存保护
