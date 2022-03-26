@@ -16,6 +16,7 @@ struct process_table{
 static volatile uint64_t* _spintable = (uint64_t*)PA2VA(0xD8);
 extern void _entry();
 extern void user_trapret();
+extern void _forkret(struct trapframe*);
 extern void swtch(struct context *old, struct context *new);
 
 static struct proc *initproc;
@@ -170,7 +171,7 @@ void forkret(){
         first = 0;
         fsinit(ROOTDEV);
     }
-    user_trapret();
+    _forkret(p->tf);
 }
 void init_user(){
     extern char _binary_build_user_initcode_bin_start[];
@@ -382,4 +383,43 @@ int32_t fork(void){
     release_spin_lock(&child_proc->lock);
 
     return child_pid;
+}
+/**
+ * @brief 等待子进程返回 返回值为子进程的pid xstate是子进程的返回值
+ * 如果此进程没有子进程 返回-1
+ * 
+ * @param xstate 
+ * @return int32_t 
+ */
+int32_t wait(int64_t *xstate){
+    struct proc *p = myproc();
+    int is_have_child = 0;
+    int pid;
+    acquire_spin_lock(&wait_lock);
+    while(1){
+        is_have_child = 0;
+        for(struct proc *np = process_table.proc; np < process_table.proc+NPROC; np++){
+            if(np->parent == p){
+                acquire_spin_lock(&np->lock);
+                is_have_child = 1;
+                if(np->state == ZOMBIE){
+                    // 找到一个已经退出的子进程
+                    pid = np->pid;
+                    if(xstate != NULL){
+                        *xstate = (int64_t)np->xstate;
+                    }
+                    freeproc(np);
+                    release_spin_lock(&np->lock);
+                    release_spin_lock(&wait_lock);
+                    return pid;
+                }
+                release_spin_lock(&np->lock);
+            }
+        }
+        if(is_have_child == 0 || p->killed){
+            release_spin_lock(&wait_lock);
+            return -1;
+        }
+        sleep(p, &wait_lock);
+    }
 }

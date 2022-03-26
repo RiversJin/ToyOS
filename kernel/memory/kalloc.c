@@ -35,7 +35,7 @@ static inline void _free_one_page(struct page * page, pg_idx_t pg_idx, order_t o
 
 
 static inline void del_page_from_free_list(struct page* page,order_t order){
-    if(page->lru.next == 0xdead000000000001 || page->lru.next == 0xdead000000000010){
+    if(page->lru.next == (void*)0xdead000000000001 || page->lru.next == (void*)0xdead000000000010){
         panic("!!!");
     }
     //cprintf("del_page_from_free_list: order: %d\t",order);

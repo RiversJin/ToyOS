@@ -140,6 +140,11 @@ el0_aarch32:
     verror BAD_AARCH32
 END(vectors)
 
+ENTRY(_forkret)
+    mov sp, x0
+    b user_trapret
+END(_forkret)
+
 ENTRY(user_trapret)
     #kernel_exit 0, ret = 1
     ldp     x21,x22, [sp, #16*16]

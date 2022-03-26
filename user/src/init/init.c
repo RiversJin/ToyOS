@@ -17,6 +17,7 @@ int main(){
         char parent_s[] = "from parent\n";
         write(0,s,sizeof(s));
         write(0,parent_s,sizeof(parent_s));
+        wait(0);
     }
     
     

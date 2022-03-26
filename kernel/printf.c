@@ -9,7 +9,7 @@ static struct print_lock{
     struct spinlock lock;
     bool locking;
 } print_lock;
-static char digits[] = "0123456789ABCEDF";
+static char digits[] = "0123456789ABCDEF";
 /**
  * @brief 向串口打印数字
  * 

@@ -4,6 +4,7 @@ int exec(char*, char**);
 int exit(int) __attribute__((noreturn));
 int getpid();
 int fork();
+int wait(int*);
 
 int mknod(const char*, short, short);
 int open(const char*, int);
