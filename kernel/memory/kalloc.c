@@ -196,6 +196,7 @@ int kalloc_pages(struct page** page,pg_idx_t* pfn,int pages_n){
     pg_idx_t _pfn;
     _page = _rm_smallest(order);
     set_page_order(_page,order);
+    set_page_used(_page);
     _pfn = _page - pages;
     if(_page == NULL)return -1;
     *page = _page;
@@ -212,6 +213,10 @@ void kfree_page(pg_idx_t pfn){
 void kfree(void *ptr){
     pg_idx_t pfn = PHY2PFn((void*)VA2PA(ptr));
     struct page* page = pages+pfn;
+    if(!is_page_used(page)){
+        panic("kfree: page not used. Double free ?.\n");
+    }
+    set_page_unused(page);
     order_t order = get_page_order(page);
     _free_one_page(page,pfn,order);
 }
