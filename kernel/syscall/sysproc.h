@@ -8,6 +8,7 @@ extern int64_t sys_fork();
 extern int64_t sys_getpid();
 extern int64_t sys_wait();
 extern int64_t sys_yield();
+extern int64_t sys_kill();
 
 extern int64_t sys_mknod();
 extern int64_t sys_dup();

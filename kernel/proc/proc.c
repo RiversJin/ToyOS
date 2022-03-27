@@ -345,6 +345,7 @@ void wakeup(void *chan){
         }
     }
 }
+
 int32_t kill(int pid){
     for(struct proc* p = process_table.proc; p < &process_table.proc[NPROC]; p++){ 
         acquire_spin_lock(&p->lock);

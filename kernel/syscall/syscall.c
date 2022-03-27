@@ -13,6 +13,7 @@ static int64_t (*syscalls[])(void) = {
     [SYS_wait] sys_wait,
     [SYS_yield] sys_yield,
     [SYS_chdir] sys_chdir,
+    [SYS_kill] sys_kill,
 
     [SYS_mknod] sys_mknod,
     [SYS_open] sys_open,
