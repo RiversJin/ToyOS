@@ -29,3 +29,8 @@ int64_t sys_wait(){
     }
     return wait((int64_t*)p);
 }
+
+int64_t sys_yeild(){
+    yield();
+    return;
+}
