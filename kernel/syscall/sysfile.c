@@ -244,3 +244,29 @@ int64_t sys_dup(){
     filedup(file);
     return fd;
 }
+
+// int chdir(const char*);
+int64_t sys_chdir(){
+    char *path;
+    struct proc *p = myproc();
+    if(argstr(0,&path) < 0) {
+        return -1;
+    }
+    begin_op();
+    struct inode *ip = namei(path);
+    if(ip == NULL){
+        end_op();
+        return -1;
+    }
+    ilock(ip);
+    if(ip->type != T_DIR){
+        iunlockandput(ip);
+        end_op();
+        return -1;
+    }
+    iunlock(ip);
+    iput(p->cwd);
+    end_op();
+    p->cwd = ip;
+    return 0;
+}

@@ -6,6 +6,7 @@ int getpid();
 int fork();
 int wait(int*);
 void yield();
+int chdir(const char*);
 
 int mknod(const char*, short, short);
 int open(const char*, int);
