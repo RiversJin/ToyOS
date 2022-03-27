@@ -441,3 +441,11 @@ int32_t wait(int64_t *xstate){
         sleep(p, &wait_lock);
     }
 }
+
+void yield(void){
+    struct proc *p = myproc();
+    acquire_spin_lock(&p->lock);
+    p->state = RUNNABLE;
+    sched();
+    release_spin_lock(&p->lock);
+}

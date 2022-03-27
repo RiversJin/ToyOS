@@ -80,4 +80,6 @@ void wakeup(void* chan);
 int32_t kill(int pid);
 int32_t fork(void);
 int32_t wait(int64_t *xstate);
+
+void yield(void);
 #endif //PROC_H
