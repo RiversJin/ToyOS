@@ -279,3 +279,17 @@ int64_t sys_fstat(){
     }
     return filestat(f,st);
 }
+// int mkdir(path);
+int64_t sys_mkdir(){
+    char *path;
+    if(argstr(0, &path) < 0) return -1;
+    begin_op();
+    struct inode *ip = create(path,T_DIR,0,0);
+    if(ip == NULL){
+        end_op();
+        return -1;
+    }
+    iunlockandput(ip);
+    end_op();
+    return 0;
+}
