@@ -270,3 +270,12 @@ int64_t sys_chdir(){
     p->cwd = ip;
     return 0;
 }
+
+int64_t sys_fstat(){
+    struct file *f;
+    struct stat *st;
+    if(argfd(0,0,&f) < 0 || argptr(1,(char**)&st,sizeof(struct stat)) < 0){
+        return -1;
+    }
+    return filestat(f,st);
+}

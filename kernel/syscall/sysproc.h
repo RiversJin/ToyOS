@@ -17,5 +17,5 @@ extern int64_t sys_close();
 extern int64_t sys_read();
 extern int64_t sys_write();
 extern int64_t sys_chdir();
-
+extern int64_t sys_fstat();
 #endif /* SYSPROC_H */
