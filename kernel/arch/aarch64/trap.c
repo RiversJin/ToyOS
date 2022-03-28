@@ -59,6 +59,7 @@ uint32_t read_irq_src(){
 }
 
 extern void uartintr(void);
+extern void clock_intr(void);
 
 void handle_arch_irq(struct trapframe * frame_ptr){
     uint32_t irq_src = read_irq_src();
@@ -67,7 +68,9 @@ void handle_arch_irq(struct trapframe * frame_ptr){
     if(irq_src & IRQ_CNTPNSIRQ){
         // yield();
         timer_reset();
-        
+        if(cpuid() == 0){
+            clock_intr();
+        }
     }else{
 
         uint32_t irq_pending_1 = get32(IRQ_PENDING_1);

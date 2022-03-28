@@ -55,3 +55,8 @@ int64_t sys_sbrk(){
     }
     return oldaddr;
 }
+extern uint64_t uptime();
+
+int64_t sys_uptime(){
+    return uptime();
+}
