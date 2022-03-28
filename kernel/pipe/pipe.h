@@ -24,4 +24,6 @@ int pipealloc(struct file **f0, struct file **f1);
 
 void pipeclose(struct pipe *pi, int writable);
 
+int32_t pipewrite(struct pipe *pi, void* addr, int32_t n);
+int32_t piperead(struct pipe *pi, void* addr, int32_t n);
 #endif // PIPE_H

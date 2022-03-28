@@ -56,3 +56,47 @@ void pipeclose(struct pipe *pi, int writable){
         release_spin_lock(&pi->lock);
     }
 }
+
+int32_t pipewrite(struct pipe *pi, void* addr, int32_t n){
+    int i = 0;
+    struct proc *p = myproc();
+    acquire_spin_lock(&pi->lock);
+    while(i < n){
+        // 没人读的管道 不要写
+        if(pi->is_readopen == 0 || p->killed != 0){
+            release_spin_lock(&pi->lock);
+            return -1;
+        }
+        if(pi->nwrite == pi->nread + PIPE_SIZE){
+            // 若管道已满 等待
+            wakeup(&pi->nread);
+            sleep(&pi->nwrite, &pi->lock);
+        }else{
+            pi->data[pi->nwrite ++ % PIPE_SIZE] = *((char*)addr + i++);
+        }
+    }
+    wakeup(&pi->nread);
+    release_spin_lock(&pi->lock);
+    return i;
+}
+int32_t piperead(struct pipe *pi, void* addr, int32_t n){
+    struct proc *p = myproc();
+    acquire_spin_lock(&pi->lock);
+    // 如果管道可用但是为空
+    while(pi->nread == pi->nwrite && pi->is_writeopen){
+        if(p->killed != 0){
+            release_spin_lock(&pi->lock);
+            return -1;
+        }
+        sleep(&pi->nread, &pi->lock);
+    }
+    int i;
+    for(i = 0; i < n; ++i){
+        if(pi->nread == pi->nwrite) break;
+
+        *((char*)addr + i) = pi->data[pi->nread++ % PIPE_SIZE];
+    }
+    wakeup(&pi->nwrite);
+    release_spin_lock(&pi->lock);
+    return i;
+}
