@@ -8,6 +8,7 @@
 #include "../proc/proc.h"
 #include "../printf.h"
 #include "../lib/string.h"
+#include "../pipe/pipe.h"
 
 static int fdalloc(struct file *f){
   int fd;
@@ -401,4 +402,29 @@ int64_t sys_unlink(void){
         iunlockandput(dp);
         end_op();
         return -1;
+}
+
+int64_t sys_pipe(void){
+    int (*fdarray)[2];
+    if(argptr(0,(char**)&fdarray,sizeof(fdarray)) < 0){
+        return -1;
+    }
+    struct file *rf, *wf;
+    if(pipealloc(&rf,&wf) < 0){
+        // 第一个读 第二个写
+        return -1;
+    }
+    struct proc *p = myproc();
+    int fd0 = -1, fd1 = -1;
+    if((fd0 = fdalloc(rf)) < 0 || (fd1 = fdalloc(wf)) < 0){
+        if(fd0 >= 0){
+            p->ofile[fd0] = NULL;
+        }
+        fileclose(rf);
+        fileclose(wf);
+        return -1;
+    }
+    (*fdarray)[0] = fd0;
+    (*fdarray)[1] = fd1;
+    return 0;
 }

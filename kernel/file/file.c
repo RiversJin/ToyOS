@@ -90,7 +90,7 @@ int32_t fileread(struct file *f, char *addr, int32_t n){
     if(!f->readable) return -1;
     int r = 0;
     if(f->type == FD_PIPE){
-        f = piperead(f->pipe, addr, n);
+        r = piperead(f->pipe, addr, n);
     } else if( f->type == FD_DEVICE ){
         if(f->major < 0 || f->major >= NDEV || !devsw[f->major].read)
             return -1;

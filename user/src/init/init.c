@@ -1,6 +1,4 @@
 #include "../lib/user.h"
-#include "../../../kernel/file/fcntl.h"
-#include "../../../kernel/file/file.h"
 
 int main(){
     if(open("console", O_RDWR) < 0){
