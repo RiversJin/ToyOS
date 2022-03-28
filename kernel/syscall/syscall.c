@@ -23,7 +23,9 @@ static int64_t (*syscalls[])(void) = {
     [SYS_close] sys_close,
     [SYS_read] sys_read,
     [SYS_write] sys_write,
-    [SYS_dup] sys_dup
+    [SYS_dup] sys_dup,
+    [SYS_link] sys_link,
+    [SYS_unlink] sys_unlink
 };
 
 int64_t syscall(struct trapframe *frame){
