@@ -293,3 +293,112 @@ int64_t sys_mkdir(){
     end_op();
     return 0;
 }
+// int link(const char*, const char*);
+int64_t sys_link(){
+    char *old;
+    char *new;
+    if(argstr(0,&old) < 0 || argstr(1,&new) < 0){
+        return -1;
+    }
+    struct inode *dp, *ip;
+    begin_op();
+    if((ip = namei(old)) == NULL){
+        end_op();
+        return -1;
+    }
+    ilock(ip);
+    if(ip->type == T_DIR){
+        iunlockandput(ip); // 不可以link目录
+        end_op();
+        return -1;
+    }
+    ip->nlink ++;
+    iupdate(ip);
+    iunlock(ip);
+    char name[DIRSIZ];
+    if((dp = nameiparent(new,name)) == NULL)
+        goto bad;
+    ilock(dp);
+    if(dp->dev != ip->dev || dirlink(dp,name,ip->inum) < 0){
+        iunlockandput(dp);
+        goto bad;
+    }
+    iunlockandput(dp);
+    iput(ip);
+    end_op();
+    return 0;
+
+    bad:
+    ilock(ip);
+    ip->nlink--;
+    iupdate(ip);
+    iunlockandput(ip);
+    end_op();
+    return -1;
+}
+// 如果此目录只包含.和.. 视为空
+static int is_dir_empty(struct inode *dp){
+    int off;
+    struct dirent de;
+    // 跳过前两个 因为是 .和..
+    for(off = 2*sizeof(de); off < dp->size; off += sizeof(de)){
+        if(readi(dp,(char*)&de,off,sizeof(de)) != sizeof(de)){
+            panic("is_dir_empty: readi failed.\n");
+        }
+        if(de.inum != 0)
+            return 0;
+    }
+    return 1;
+}
+// int unlink(const char*);
+int64_t sys_unlink(void){
+    char *path;
+    if(argstr(0,&path) < 0){
+        return -1;
+    }
+    struct inode *dp, *ip;
+    char name[DIRSIZ];
+    begin_op();
+    if((dp = nameiparent(path,name)) == NULL){
+        end_op();
+        return -1;
+    }
+    ilock(dp);
+    // . 和 .. 是不行的
+    if(namecmp(name,".") == 0 || namecmp(name,".."))
+        goto bad;
+    struct dirent de;
+    uint32_t off;
+    if((ip = dirlookup(dp, name, &off)) == NULL)
+        goto bad;
+    ilock(ip);
+
+    if(ip->nlink < 1){
+        panic("unlink: nlink < 1\n");
+    }
+    if(ip->type == T_DIR && !is_dir_empty(ip)){
+        // 此文件夹非空是不可以的
+        iunlockandput(ip);
+        goto bad;
+    }
+    memset(&de,0,sizeof(de));
+    if(writei(dp,(char*)&de,off,sizeof(de)) != sizeof(de)){
+        panic("unlink: writei failed.\n");
+    }
+    if(ip->type == T_DIR){
+        dp->nlink --;
+        iupdate(dp);
+    }
+    iunlockandput(dp);
+
+    ip->nlink -- ;
+    iupdate(ip);
+    iunlockandput(ip);
+    end_op();
+    return 0;
+
+    bad:
+        iunlockandput(dp);
+        end_op();
+        return -1;
+}

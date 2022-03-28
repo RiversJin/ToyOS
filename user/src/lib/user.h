@@ -18,6 +18,8 @@ int close(int);
 int read(int, void*, int);
 int write(int, const void*, int);
 int dup(int);
+int link(const char*, const char*);
+int unlink(const char*);
 
 
 #endif /* USER_H */

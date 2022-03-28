@@ -20,4 +20,7 @@ extern int64_t sys_read();
 extern int64_t sys_write();
 extern int64_t sys_chdir();
 extern int64_t sys_fstat();
+extern int64_t sys_link(void);
+extern int64_t sys_unlink(void);
+
 #endif /* SYSPROC_H */

@@ -88,4 +88,5 @@ struct inode* dirlookup(struct inode* dp, char *name, uint32_t *poff);
 void iupdate(struct inode *ip);
 int dirlink(struct inode *dp, char *name, uint32_t inum);
 struct inode* namei(char *path);
+int namecmp(const char *s, const char *t);
 #endif /* FS_H */
