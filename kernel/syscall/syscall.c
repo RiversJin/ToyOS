@@ -17,7 +17,7 @@ static int64_t (*syscalls[])(void) = {
     [SYS_kill] sys_kill,
     [SYS_sbrk] sys_sbrk,
     [SYS_uptime] sys_uptime,
-
+    [SYS_sleep] sys_sleep,
     [SYS_fstat] sys_fstat,
     [SYS_mknod] sys_mknod,
     [SYS_mkdir] sys_mkdir,

@@ -12,7 +12,7 @@ extern int64_t sys_kill();
 extern int64_t sys_sbrk();
 extern int64_t sys_pipe();
 extern int64_t sys_uptime();
-
+extern int64_t sys_sleep();
 extern int64_t sys_mknod();
 extern int64_t sys_mkdir();
 extern int64_t sys_dup();

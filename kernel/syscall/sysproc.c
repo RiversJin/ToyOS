@@ -60,3 +60,25 @@ extern uint64_t uptime();
 int64_t sys_uptime(){
     return uptime();
 }
+
+extern struct spinlock tickslock;
+extern uint64_t ticks;
+
+int64_t sys_sleep(){
+    int64_t n;
+    if(argint(0, (uint64_t*)&n) < 0){
+        return -1;
+    }
+    
+    acquire_spin_lock(&tickslock);
+    uint64_t ticks0 = ticks;
+    while(ticks < ticks0 + n){
+        if(myproc()->killed != 0){
+            release_spin_lock(&tickslock);
+            return -1;
+        }
+        sleep(&ticks,&tickslock);
+    }
+    release_spin_lock(&tickslock);
+    return 0;
+}
