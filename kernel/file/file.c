@@ -5,6 +5,7 @@
 #include "../printf.h"
 #include "../include/param.h"
 #include "../include/stat.h"
+#include "../pipe/pipe.h"
 
 struct devsw devsw[NDEV];
 struct ftable {
@@ -68,7 +69,7 @@ void fileclose(struct file *f){
     release_spin_lock(&ftable.lock);
 
     if(ff.type == FD_PIPE){
-        // TODO: implement pipe
+        pipeclose(ff.pipe, ff.writable);
     } else if(ff.type == FD_INODE || ff.type == FD_DEVICE){
         begin_op();
         iput(ff.ip);
@@ -89,7 +90,7 @@ int32_t fileread(struct file *f, char *addr, int32_t n){
     if(!f->readable) return -1;
     int r = 0;
     if(f->type == FD_PIPE){
-        // TODO: implement pipe
+        f = piperead(f->pipe, addr, n);
     } else if( f->type == FD_DEVICE ){
         if(f->major < 0 || f->major >= NDEV || !devsw[f->major].read)
             return -1;
@@ -112,7 +113,7 @@ int32_t filewrite(struct file* f, char* addr, int32_t n){
     int ret = 0;
     switch(f->type){
         case FD_PIPE:
-            // TODO: implement pipe
+            ret = pipewrite(f->pipe, addr, n);
             break;
         case FD_DEVICE:
             if(f->major < 0 || f->major >= NDEV || !devsw[f->major].write){
