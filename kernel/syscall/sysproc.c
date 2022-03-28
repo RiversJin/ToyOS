@@ -30,15 +30,15 @@ int64_t sys_wait(){
     return wait((int64_t*)p);
 }
 
-int64_t sys_yeild(){
+int64_t sys_yield(){
     yield();
-    return;
+    return 0;
 }
 
 // int kill(int pid)
 int64_t sys_kill(void){
     int64_t pid;
-    if(argint(0,&pid) < 0){
+    if(argint(0,(uint64_t*)&pid) < 0){
         return -1;
     }
     return kill(pid);
