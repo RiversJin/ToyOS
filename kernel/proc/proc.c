@@ -450,3 +450,17 @@ void yield(void){
     sched();
     release_spin_lock(&p->lock);
 }
+
+int32_t growproc(int64_t n){
+    struct proc *p = myproc();
+    int32_t sz = p->sz;
+    if(n > 0){
+        if((sz = uvmalloc(p->pagetable,sz,sz + n)) == 0){
+            return -1;
+        }
+    } else if(n < 0){
+        sz = uvmdealloc(p->pagetable,sz,sz + n);
+    }
+    p->sz = sz;
+    return 0;
+}

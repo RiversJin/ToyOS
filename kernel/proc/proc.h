@@ -82,4 +82,6 @@ int32_t fork(void);
 int32_t wait(int64_t *xstate);
 
 void yield(void);
+int32_t growproc(int64_t n);
+
 #endif //PROC_H

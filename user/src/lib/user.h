@@ -7,8 +7,12 @@ int fork();
 int wait(int*);
 void yield();
 int chdir(const char*);
+int kill(int pid);
+char* sbrk(int);
 
+int fstat(int fd, struct stat*);
 int mknod(const char*, short, short);
+int mkdir(const char*);
 int open(const char*, int);
 int close(int);
 int read(int, void*, int);

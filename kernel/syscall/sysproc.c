@@ -43,3 +43,15 @@ int64_t sys_kill(void){
     }
     return kill(pid);
 }
+// void* sbrk(int delta)
+int64_t sys_sbrk(){
+    int64_t delta;
+    if(argint(0,(uint64_t*)&delta) < 0){
+        return -1;
+    }
+    int64_t oldaddr = myproc()->sz;
+    if(growproc(delta) < 0){
+        return -1;
+    }
+    return oldaddr;
+}
