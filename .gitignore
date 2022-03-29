@@ -2,3 +2,5 @@
 .gdb_history
 build/
 user/src/lib/usyscall.S
+
+.xmake

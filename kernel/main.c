@@ -24,7 +24,7 @@ void main(){
         procinit();
         exception_handler_init();
         irqinit();
-        timer_init();
+        //timer_init();
         enable_interrupt();
         binit();
         sd_init();

@@ -21,6 +21,16 @@ static inline int is_send_buffer_empty(){
 static inline int is_recv_buffer_not_empty(){
     return (get32(AUX_MU_IIR_REG) & (1 << 2)) != 0;
 }
+void enable_recv_interrupt(void){
+    uint32_t value = get32(AUX_MU_IER_REG);
+    value |= 0b1;
+    put32(AUX_MU_IER_REG, value);
+}
+void disable_recv_interrupt(void){
+    uint32_t value = get32(AUX_MU_IER_REG);
+    value &= ~(0b1);
+    put32(AUX_MU_IER_REG, value);
+}
 
 /**
  * @brief 初始化串口
@@ -52,7 +62,10 @@ void uart_init(void)
     put32(AUX_MU_IIR_REG,((0b11<<1)|(0b11 << 6))); // 清空接受和发送的FIFO 使能FIFO
     put32(AUX_MU_CNTL_REG, 3);   // 重新使能串口传输
     //put32(AUX_MU_IER_REG, 0b11); // 打开串口收发中断 
-    //enable_sent_interrupt();
+}
+
+int get_mu_iir(){
+    return get32(AUX_MU_IIR_REG);
 }
 /**
  * @brief 向串口发送一个字符 异步

@@ -301,6 +301,7 @@ static uint32_t bmap(struct inode *ip, uint32_t bn){
         }
         return addr;
     }
+    bn -= NDIRECT;
     // 如果是间接块的话
     if(bn < NINDIRECT){
         // 如果间接块为空的话 先分配一个
