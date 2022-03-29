@@ -31,7 +31,7 @@ void main(){
         iinit();
         fileinit();
         init_user();
-        init_awake_ap_by_spintable();
+        //init_awake_ap_by_spintable();
         //scheduler();
         //while(1);
     }else{

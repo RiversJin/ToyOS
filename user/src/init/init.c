@@ -10,8 +10,11 @@ int main(){
     if(pid == 0){
         char child_s[] = "from child\n";
         write(0,s,sizeof(s));
+        sleep(10);
         write(0,child_s,sizeof(child_s));
+        
     }else{
+        
         char parent_s[] = "from parent\n";
         write(0,s,sizeof(s));
         write(0,parent_s,sizeof(parent_s));

@@ -32,7 +32,7 @@ void el_sync_trap(struct trapframe * frame_ptr,uint64_t esr){
     panic("el_sync_trap: exception class id: 0x%x, iss: %d",exception_class_id, iss);
 }
 void el0_sync_trap(struct trapframe * frame,uint64_t esr){
-    cprintf("el0_sync_trap.\n");
+    //cprintf("el0_sync_trap.\n");
     uint64_t exception_class_id = (esr >> 26)&0b111111;
     uint64_t iss = (esr & ISS_MASK);
     if(exception_class_id == EC_SVC64 && iss == 0){
@@ -66,11 +66,11 @@ void handle_arch_irq(struct trapframe * frame_ptr){
     // 如果当前核心有时间中断
     // cprintf("..");
     if(irq_src & IRQ_CNTPNSIRQ){
-        // yield();
-        timer_reset();
         if(cpuid() == 0){
             clock_intr();
         }
+        timer_reset();
+        yield();
     }else{
 
         uint32_t irq_pending_1 = get32(IRQ_PENDING_1);

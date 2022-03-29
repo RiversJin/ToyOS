@@ -54,6 +54,8 @@ void yield();
 int chdir(const char*);
 int kill(int pid);
 char* sbrk(int);
+int sleep(int);
+int uptime(void);
 
 int fstat(int fd, struct stat * stat);
 int mknod(const char*, short, short);
