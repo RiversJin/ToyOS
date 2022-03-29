@@ -130,12 +130,12 @@ static struct proc * allocproc(void){
 
     memset(&p->context,0,sizeof(struct context));
     // 构造返回地址
-    cprintf("allocproc: kernel sp: 0x%x \n",sp);
+    //cprintf("allocproc: kernel sp: 0x%x \n",sp);
     p->context.x29 = (uint64_t)sp;
     p->context.sp_el1 = (uint64_t)sp;
     p->context.x30 = (uint64_t)forkret;
 
-    cprintf("alloc_proc: process %d allocated. \n",p->pid);
+    //cprintf("alloc_proc: process %d allocated. \n",p->pid);
     return p;
 }
 

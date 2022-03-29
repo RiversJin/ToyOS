@@ -26,6 +26,13 @@ typedef unsigned long uint64;
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 
+#define DIRSIZ 14
+
+struct dirent {
+    uint16_t inum;
+    char name[DIRSIZ];
+};
+
 #undef NULL
 #if defined(__cplusplus)
 #define NULL 0
