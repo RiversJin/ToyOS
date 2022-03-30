@@ -41,6 +41,9 @@ void main(){
     }
     
     cprintf("main: [CPU %d] started.\n", cpuid());
+    if(cpuid()==0){
+        cprintf("\n------------------------\nKernel boot success.\n------------------------\n\n");
+    }
     scheduler();
     while(1){
         
