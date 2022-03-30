@@ -24,14 +24,14 @@ void main(){
         procinit();
         exception_handler_init();
         irqinit();
-        timer_init();
+        //timer_init();
         enable_interrupt();
         binit();
         sd_init();
         iinit();
         fileinit();
         init_user();
-        init_awake_ap_by_spintable();
+        //init_awake_ap_by_spintable();
         //scheduler();
         //while(1);
     }else{

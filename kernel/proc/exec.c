@@ -111,7 +111,7 @@ int exec(char *path, char **argv){
         cprintf("exec: push argument error.\n");
         goto bad;
     }
-    p->tf->regs[0] = sp;
+    p->tf->regs[1] = sp; // exec返回相当于调用用户进程的main 而x0即argc通过exec返回值配置
     // 调试用 将程序名复制到proc中
     char* last = path;
     for (char* s = path; *s; ++s)

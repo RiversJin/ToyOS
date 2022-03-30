@@ -64,7 +64,7 @@ qemu:
 .PHONY: qemu-gdb
 qemu-gdb:
 	xmake
-	$(QEMU) -kernel $< -S -gdb tcp::1234
+	$(QEMU) -kernel $(KERNEL_IMG) -S -gdb tcp::1234
 gdb: 
 	gdb -x .gdbinit
 

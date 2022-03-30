@@ -51,6 +51,14 @@ for _, taskname in ipairs(os.dirs("src/*")) do
             add_cflags(cflags, {force = true})
             add_ldflags(ldflags, {force = true})
             add_deps("user_lib")
+            after_build(function(target)
+                local ARCH = "aarch64-linux-gnu-"
+                local OBJDUMP = ARCH .. "objdump"
+                local targetfile = target:targetfile()
+                path.join(target:targetdir(),path.basename(target:filename()).."8.img")
+                local asm_path = target:targetdir() .. "/../" .. path.basename(target:filename())
+                os.execv(OBJDUMP, {"-S",targetfile}, {stdout = asm_path .. ".asm"})
+            end)
         target_end()
     end
 end
