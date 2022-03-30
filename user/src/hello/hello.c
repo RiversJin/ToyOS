@@ -9,7 +9,8 @@ _|_|_|_|_|                          _|_|      _|_|_|  \n\
     _|      _|_|      _|_|_|        _|_|    _|_|_|    \n\
                           _|                          \n\
                       _|_|                            \n\n\
-                                By RiversJin based on xv6-riscv\n";
+                                By RiversJin based on xv6-riscv\n\
+                                Hello, the World ~~\n";
 
 int main(){
     printf("%s",s);
