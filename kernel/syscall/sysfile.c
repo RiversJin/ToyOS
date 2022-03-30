@@ -109,7 +109,7 @@ int64_t sys_open(){
     struct inode *ip;
     struct file *file;
     begin_op();
-    if(mode == O_CREATE){
+    if(mode & O_CREATE){
         ip = create(path, T_FILE, 0, 0);
         if(ip == NULL){
             end_op();
