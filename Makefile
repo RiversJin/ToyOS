@@ -55,13 +55,20 @@ $(KERNEL_IMG): $(KERNEL_ELF)
 -include mksd.mk
 QEMU := qemu-system-aarch64 -M raspi3 -nographic -serial null -serial mon:stdio -drive file=$(SD_IMG),if=sd,format=raw
 
-qemu: $(KERNEL_IMG) $(SD_IMG)
-	$(QEMU) -kernel $<
-qemu-gdb: $(KERNEL_IMG)
+#qemu: $(KERNEL_IMG) $(SD_IMG)
+#	$(QEMU) -kernel $<
+.PHONY: qemu
+qemu:
+	xmake
+	$(QEMU) -kernel $(KERNEL_IMG)
+.PHONY: qemu-gdb
+qemu-gdb:
+	xmake
 	$(QEMU) -kernel $< -S -gdb tcp::1234
 gdb: 
 	gdb -x .gdbinit
 
 .PHONY: clean
 clean:
+	xmake clean
 	rm -r $(BUILD_DIR)
