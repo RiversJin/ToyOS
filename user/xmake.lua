@@ -13,19 +13,25 @@ toolchain("aarch64-linux-gnu")
 
 
 target("user_lib")
-    set_targetdir("../build/user")
+    set_targetdir("$(projectdir)/build/user")
     set_toolchains("aarch64-linux-gnu")
     set_kind("static")
     add_files("src/lib/*.c")
     on_load(function(target)
-        if((not os.exists("src/lib/usyscall.S")) or os.mtime("../kernel/syscall/syscall.h") > os.mtime("src/lib/usyscall.S") ) then
+        local projectdir = os.projectdir()
+        local target_s = path.join(projectdir, path.translate("user/src/lib/usyscall.S"))
+        local source_h = path.join(projectdir, path.translate("kernel/syscall/syscall.h"))
+        local tool_path = path.join(projectdir, path.translate("tool/mksyscall/mksyscall.py"))
+        if((not os.exists(target_s)) or os.mtime(source_h) > os.mtime(target_s) ) then
             cprint('${bright green}Re-generating usyscall.S${clear}')
-            os.execv("python3",{"../tool/mksyscall/mksyscall.py", "../kernel/syscall/syscall.h"}, {stdout = "src/lib/usyscall.S"})
+            os.execv("python3",{tool_path, source_h}, {stdout = target_s})
             cprint('${bright green}usyscall.S generated${clear}')
         end
     end)
     after_clean(function(target)
-        os.tryrm("src/lib/usyscall.S")
+        local projectdir = os.projectdir()
+        local target_s = path.join(projectdir, path.translate("user/src/lib/usyscall.S"))
+        os.tryrm(target_s)
     end)
     add_files("src/lib/usyscall.S")
     add_cflags(cflags, {force = true})
@@ -38,7 +44,7 @@ for _, taskname in ipairs(os.dirs("src/*")) do
     if taskname ~= "lib" then
         table.insert(tasknames, taskname)
         target(taskname)
-            set_targetdir("../build/user/bin")
+            set_targetdir("$(projectdir)/build/user/bin")
             set_toolchains("aarch64-linux-gnu")
             set_kind("binary")
             add_files("src/" .. taskname .. "/*.c")
@@ -51,8 +57,8 @@ end
 
 target("mkfs")
     set_kind("binary")
-    add_files("../tool/mkfs/*.c")
-    set_targetdir("../build/tool/")
+    add_files("$(projectdir)/tool/mkfs/*.c")
+    set_targetdir("$(projectdir)/build/tool/")
 target_end()
 
 target("fs")
@@ -64,13 +70,13 @@ target("fs")
     end
     after_build(function ()
         bins = ""
-        for _, file in ipairs(os.files("../build/user/bin/*")) do
+        for _, file in ipairs(os.files("$(projectdir)/build/user/bin/*")) do
             bins = bins .. " " .. file
         end
-        os.exec("../build/tool/mkfs" .. " " .. "../build/fs.img" .. bins)
-        print("文件系统 构建完成")
+        os.exec("$(projectdir)/build/tool/mkfs" .. " " .. "$(projectdir)/build/fs.img" .. " " .. bins)
+        cprint('${bright green}file system img is built --> ' .. "$(projectdir)/build/fs.img".. '${clear}')
     end)
     after_clean(function ()
-        os.rm("../build/fs.img")
+        os.rm("$(projectdir)/build/fs.img")
         print("文件系统 清理完成")
     end)
