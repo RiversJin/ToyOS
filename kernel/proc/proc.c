@@ -385,7 +385,7 @@ int32_t fork(void){
         }
     }
     // 配置工作目录
-    child_proc->cwd = parent_proc->cwd;
+    child_proc->cwd = idup(parent_proc->cwd);
     strncpy(child_proc->name, parent_proc->name, sizeof(child_proc->name));
 
     int child_pid = child_proc->pid;

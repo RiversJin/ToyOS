@@ -225,7 +225,7 @@ int64_t sys_exec(){
             cprintf("sys_exec: failed to fetch argument.\n");
             return -1;
         }
-        cprintf("sys_exec: argv[%d] = '%s'\n", i, argv[i]);
+        //cprintf("sys_exec: argv[%d] = '%s'\n", i, argv[i]);
     }
     return exec(path,argv);
 }
