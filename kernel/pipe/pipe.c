@@ -27,6 +27,8 @@ int pipealloc(struct file **f0, struct file **f1){
     (*f1)->writable = 1;
     (*f1)->pipe = pi;
 
+    return 0;
+
     bad:
     if(pi != NULL){
         kfree(pi);
